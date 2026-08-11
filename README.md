@@ -19,7 +19,8 @@ https://github.com/xileshuo/jinianri
 ## 界面展示
 
 ### 界面总览
-![Uploading 纪念日.png…]()
+<img width="1900" height="1200" alt="纪念日" src="https://github.com/user-attachments/assets/4e9d2761-eaea-4ff9-9586-1e58cd6ae32d" />
+
 
 ## 使用说明
 纪念日插件用于记录生日、恋爱、婚姻等重要日期，自动计算「已过时长」与「距离下次还有几天」，并支持三档全局提醒与 iCal 导出。
