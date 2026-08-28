@@ -1,0 +1,10 @@
+{
+  "id": "jinianri",
+  "name": "纪念日",
+  "version": "4.0.3",
+  "minAppVersion": "1.7.2",
+  "description": "记录生日与纪念日，阴历阳历自动换算，侧边栏倒计时、三档提醒、iCal 导出；设置存 data.json，纪念事项存 events.json。",
+  "author": "囍樂",
+  "authorUrl": "https://xhslink.com/m/3uOoUHv2rI1",
+  "isDesktopOnly": false
+}
