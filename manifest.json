@@ -1,0 +1,10 @@
+{
+  "id": "jinianri",
+  "name": "纪念日",
+  "version": "4.0.4",
+  "minAppVersion": "1.7.2",
+  "description": "Track birthdays and anniversaries with lunar/solar dates, countdowns, reminders, and iCal export.",
+  "author": "囍樂",
+  "authorUrl": "https://github.com/xileshuo",
+  "isDesktopOnly": false
+}
