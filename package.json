@@ -1,0 +1,27 @@
+{
+  "name": "obsidian-jinianri",
+  "version": "4.0.5",
+  "description": "Obsidian 纪念日插件 — 记录重要日期，显示已过时长与下次倒计时，支持三档全局提醒",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs production"
+  },
+  "keywords": [
+    "obsidian",
+    "anniversary",
+    "countdown",
+    "纪念日"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "builtin-modules": "^4.0.0",
+    "esbuild": "^0.21.5",
+    "obsidian": "latest",
+    "typescript": "^5.5.0"
+  },
+  "dependencies": {
+    "lunar-javascript": "^1.6.12"
+  }
+}
