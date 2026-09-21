@@ -1,70 +1,7 @@
 # jinianri
-
-> **Paid · 48-hour trial · ¥29.9 permanent unlock**
-
-## Overview
-
-jinianri is a paid LifeOS plugin for birthdays and memorial dates in Obsidian, with lunar/solar calendars, sidebar countdowns, multi-level reminders, and iCal export.
-
-Current public build: **4.0.11** (48-hour trial).
-
-## LifeOS family
-
-Companion plugins by the same author — open each other in Community Plugins, or on GitHub:
-
-| Plugin | Community (after listed) | GitHub |
-| --- | --- | --- |
-| **BrainCore LifeOS** | [Open plugin page](obsidian://show-plugin?id=braincore-lifeos) · search `BrainCore LifeOS` | [BrainCore LifeOS](https://github.com/xileshuo/BrainCore-LifeOS) |
-| **PlainLedger** | [Open plugin page](obsidian://show-plugin?id=plain-ledger) · search `PlainLedger` | [PlainLedger](https://github.com/xileshuo/plain-ledger-obsidian) |
-| **jinianri** | [Open plugin page](obsidian://show-plugin?id=jinianri) · search `jinianri` | [jinianri](https://github.com/xileshuo/jinianri) |
-
-## Pricing
-
-| Item | Details |
-| --- | --- |
-| Install | Free from Community Plugins (when listed), BRAT, or GitHub Releases |
-| Trial | Start a **48-hour full trial** inside the plugin |
-| Unlock | **¥29.9** one-time payment, permanent activation per device fingerprint |
-| Purchase | Contact the author on Xiaohongshu → pay → paste your device fingerprint → receive an activation code |
-
-## Installation
-
-### Community plugins
-
-Settings → Community plugins → Browse → search **jinianri** → Install → Enable.
-
-### BRAT
-
-1. Install and enable **BRAT**
-2. Add this repository:
-
-```text
-https://github.com/xileshuo/jinianri
-```
-
-3. Enable the plugin; use BRAT to check for updates later.
-
-### Manual install
-
-Download `main.js` and `manifest.json` from the [Latest Release](https://github.com/xileshuo/jinianri/releases/latest) into `.obsidian/plugins/jinianri/`.
-
-## Usage
-
-1. Enable **jinianri** and open it from the left ribbon (or the command palette).
-2. Start the **48-hour trial** from the in-plugin activation panel when prompted.
-3. Use the sidebar / main panel for daily work; full help is also available inside **Settings → Usage guide**.
-4. After the trial ends, copy your device fingerprint and unlock with a purchased activation code.
-
-### Links
-
-- Author: https://github.com/xileshuo
-- Repository: https://github.com/xileshuo/jinianri
-- Buy / support: Xiaohongshu (contact the author for an activation code)
-
-# jinianri
 > **付费 · 48 小时试用 · ¥29.9 永久激活**
 Obsidian 生日与纪念日插件（LifeOS）。阴历/阳历、侧边栏倒计时、三档提醒、iCal 导出。插件市场显示名：jinianri。
-当前公开版本：**4.0.11 · 48 小时试用**
+当前公开版本：**4.0.12 · 48 小时试用**
 ## 定价与购买
 | 项目 | 说明 |
 | --- | --- |
@@ -101,6 +38,19 @@ https://github.com/xileshuo/jinianri
 ### 手动安装
 
 下载 [Latest Release](https://github.com/xileshuo/jinianri/releases/latest) 的 `main.js`、`manifest.json` 到 `.obsidian/plugins/jinianri/`。
+## 界面预览
+
+**时间轴**
+
+![时间轴](https://raw.githubusercontent.com/xileshuo/jinianri/main/media/timeline.png)
+
+**日历与临近**
+
+![日历与临近](https://raw.githubusercontent.com/xileshuo/jinianri/main/media/calendar.png)
+
+**分组列表**
+
+![分组列表](https://raw.githubusercontent.com/xileshuo/jinianri/main/media/list.png)
 ## 使用说明
 纪念日插件用于记录生日、恋爱、婚姻等重要日期，自动计算「已过时长」与「距离下次还有几天」，并支持三档全局提醒与 iCal 导出。
 
@@ -262,6 +212,11 @@ https://github.com/xileshuo/jinianri
 
 打开 Obsidian → 点击日历爱心图标 → 激活后管理你的重要日期 → 到点自动提醒，不再错过。
 ## 更新日志
+### 4.0.12
+
+- 市场显示名固定为 jinianri（覆盖社区目录里的 Anniversaries）
+- 公开 README：中文在前、英文在后；上传时间轴 / 日历 / 列表截图
+
 ### 4.0.11
 
 - 市场显示名改回 jinianri（不再用 Anniversaries；库内界面仍可用中文「纪念日」）
@@ -296,14 +251,72 @@ https://github.com/xileshuo/jinianri
 ### 4.0.5
 
 - 社区目录：manifest.name 改为 Anniversaries（符合英文命名规范；插件内仍显示「纪念日」）
-
-### 4.0.4
-
-- 社区分发：公开包改为 48 小时试用，到期后 ¥29.9 永久激活
-- 关于：所有作品互相介绍售价，未安装可跳转 GitHub 了解/安装
-- 体验版：试用时长与显示名统一为 48 小时
 ---
 ## 分发说明
 本仓库用于社区插件 / BRAT / GitHub Release 分发与产品介绍，并附带 `src/` 等源码便于社区审核。
 仓库：https://github.com/xileshuo/jinianri
-上方英文部分供社区审核；本段为完整中文说明。
+下方为英文说明（社区审核）。
+
+
+# jinianri
+
+> **Paid · 48-hour trial · ¥29.9 permanent unlock**
+
+## Overview
+
+jinianri is a paid LifeOS plugin for birthdays and memorial dates in Obsidian, with lunar/solar calendars, sidebar countdowns, multi-level reminders, and iCal export.
+
+Current public build: **4.0.12** (48-hour trial).
+
+## LifeOS family
+
+Companion plugins by the same author — open each other in Community Plugins, or on GitHub:
+
+| Plugin | Community (after listed) | GitHub |
+| --- | --- | --- |
+| **BrainCore LifeOS** | [Open plugin page](obsidian://show-plugin?id=braincore-lifeos) · search `BrainCore LifeOS` | [BrainCore LifeOS](https://github.com/xileshuo/BrainCore-LifeOS) |
+| **PlainLedger** | [Open plugin page](obsidian://show-plugin?id=plain-ledger) · search `PlainLedger` | [PlainLedger](https://github.com/xileshuo/plain-ledger-obsidian) |
+| **jinianri** | [Open plugin page](obsidian://show-plugin?id=jinianri) · search `jinianri` | [jinianri](https://github.com/xileshuo/jinianri) |
+
+## Pricing
+
+| Item | Details |
+| --- | --- |
+| Install | Free from Community Plugins (when listed), BRAT, or GitHub Releases |
+| Trial | Start a **48-hour full trial** inside the plugin |
+| Unlock | **¥29.9** one-time payment, permanent activation per device fingerprint |
+| Purchase | Contact the author on Xiaohongshu → pay → paste your device fingerprint → receive an activation code |
+
+## Installation
+
+### Community plugins
+
+Settings → Community plugins → Browse → search **jinianri** → Install → Enable.
+
+### BRAT
+
+1. Install and enable **BRAT**
+2. Add this repository:
+
+```text
+https://github.com/xileshuo/jinianri
+```
+
+3. Enable the plugin; use BRAT to check for updates later.
+
+### Manual install
+
+Download `main.js` and `manifest.json` from the [Latest Release](https://github.com/xileshuo/jinianri/releases/latest) into `.obsidian/plugins/jinianri/`.
+
+## Usage
+
+1. Enable **jinianri** and open it from the left ribbon (or the command palette).
+2. Start the **48-hour trial** from the in-plugin activation panel when prompted.
+3. Use the sidebar / main panel for daily work; full help is also available inside **Settings → Usage guide**.
+4. After the trial ends, copy your device fingerprint and unlock with a purchased activation code.
+
+### Links
+
+- Author: https://github.com/xileshuo
+- Repository: https://github.com/xileshuo/jinianri
+- Buy / support: Xiaohongshu (contact the author for an activation code)
