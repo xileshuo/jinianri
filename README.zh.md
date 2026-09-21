@@ -1,7 +1,7 @@
-# Anniversaries
+# jinianri
 > **付费 · 48 小时试用 · ¥29.9 永久激活**
-Obsidian 生日与纪念日插件（LifeOS）。阴历/阳历、侧边栏倒计时、三档提醒、iCal 导出。
-当前公开版本：**4.0.10 · 48 小时试用**
+Obsidian 生日与纪念日插件（LifeOS）。阴历/阳历、侧边栏倒计时、三档提醒、iCal 导出。插件市场显示名：jinianri。
+当前公开版本：**4.0.11 · 48 小时试用**
 ## 定价与购买
 | 项目 | 说明 |
 | --- | --- |
@@ -9,11 +9,20 @@ Obsidian 生日与纪念日插件（LifeOS）。阴历/阳历、侧边栏倒计�
 | **付费** | ¥29.9 一次付费，按设备指纹永久激活 |
 | **购买** | 小红书联系作者下单 → 复制设备指纹 → 粘贴激活码 |
 作者：[github.com/xileshuo](https://github.com/xileshuo) · 小红书：[下单入口](https://xhslink.com/m/3uOoUHv2rI1)
+## LifeOS 三插件互跳
+
+同一作者的 LifeOS 系列，可在社区插件里互相打开，或前往 GitHub：
+
+| 插件 | 社区插件（已上架后） | GitHub |
+| --- | --- | --- |
+| **BrainCore LifeOS** | [打开插件页](obsidian://show-plugin?id=braincore-lifeos) · 搜索 `BrainCore LifeOS` | [BrainCore LifeOS](https://github.com/xileshuo/BrainCore-LifeOS) |
+| **PlainLedger** | [打开插件页](obsidian://show-plugin?id=plain-ledger) · 搜索 `PlainLedger` | [PlainLedger](https://github.com/xileshuo/plain-ledger-obsidian) |
+| **jinianri** | [打开插件页](obsidian://show-plugin?id=jinianri) · 搜索 `jinianri` | [jinianri](https://github.com/xileshuo/jinianri) |
 ## 安装
 
 ### 社区插件
 
-设置 → 第三方插件 → 浏览 → 搜索 **Anniversaries** → 安装 → 启用。
+设置 → 第三方插件 → 浏览 → 搜索 **jinianri** → 安装 → 启用。
 
 ### BRAT
 
@@ -190,6 +199,12 @@ https://github.com/xileshuo/jinianri
 
 打开 Obsidian → 点击日历爱心图标 → 激活后管理你的重要日期 → 到点自动提醒，不再错过。
 ## 更新日志
+### 4.0.11
+
+- 市场显示名改回 jinianri（不再用 Anniversaries；库内界面仍可用中文「纪念日」）
+- 社区 CSS lint：去掉 !important 等审核警告
+- 文档：公开 README 英文在前 + 完整中文，并加上 LifeOS 三插件互跳链接
+
 ### 4.0.10
 
 - 社区 Scorecard：`npm run build` 默认 trial 旗标，与 Release 48h 体验版 main.js 对齐
@@ -224,14 +239,8 @@ https://github.com/xileshuo/jinianri
 - 社区分发：公开包改为 48 小时试用，到期后 ¥29.9 永久激活
 - 关于：所有作品互相介绍售价，未安装可跳转 GitHub 了解/安装
 - 体验版：试用时长与显示名统一为 48 小时
-
-### 4.0.3
-
-- 关于：所有作品改为纵向排列
-- 设置·数据：移除与关于重复的「更新日志」入口
-- 文档：使用说明中更新日志入口改为「设置 → 关于」
 ---
 ## 分发说明
 本仓库用于社区插件 / BRAT / GitHub Release 分发与产品介绍，并附带 `src/` 等源码便于社区审核。
 仓库：https://github.com/xileshuo/jinianri
-英文短说明见 [README.md](./README.md)。
+上方英文部分供社区审核；本段为完整中文说明。

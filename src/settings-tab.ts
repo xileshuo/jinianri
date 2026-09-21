@@ -130,6 +130,11 @@ export class JinianriSettingTab extends PluginSettingTab {
 
     this.scrollToHighlightedEvent();
 
+    containerEl.querySelectorAll<HTMLElement>(".setting-item").forEach((row) => {
+      const hasField = row.querySelector("input, select, textarea, .checkbox-container");
+      row.toggleClass("jnr-settings-action-only", !hasField);
+    });
+
     if (this.plugin.pendingAddEventOnSettings) {
       this.plugin.pendingAddEventOnSettings = false;
       window.requestAnimationFrame(() => this.openEventModal(null));
