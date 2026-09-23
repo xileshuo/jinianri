@@ -4,7 +4,7 @@ const { Plugin, ItemView, WorkspaceLeaf, Modal, Notice, Menu, PluginSettingTab, 
 // 【可编辑区】版本 / 更新说明 / 授权 — 与 BrainCore 一样，改这里即可
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const PLUGIN_VERSION = "4.0.12";
+const PLUGIN_VERSION = "4.0.13";
 // 发行版本标记，取值 personal | public。与 PLUGIN_REQUIRE_LICENSE 是两个独立维度：
 // 这个决定「给谁用、预填什么数据」（个人版 = 个人纪念事项，公版 = 3 条示例），
 // PLUGIN_REQUIRE_LICENSE 决定「要不要激活码」。公版（免激活）就是 public + false。
@@ -17,6 +17,9 @@ const PLUGIN_INTRO = "这是一个专为 Obsidian 开发的纪念日管理软件
 
 /** 按版本维护；弹窗默认展开最新版，历史版本点击展开 */
 const PLUGIN_CHANGELOG = {
+  "4.0.13": [
+    "审核：manifest 英文 description；README 市场名统一为 jinianri；版本对齐",
+  ],
   "4.0.12": [
     "市场显示名固定为 jinianri（覆盖社区目录里的 Anniversaries）",
     "公开 README：中文在前、英文在后；上传时间轴 / 日历 / 列表截图",

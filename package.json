@@ -1,6 +1,6 @@
 {
   "name": "obsidian-jinianri",
-  "version": "4.0.12",
+  "version": "4.0.13",
   "description": "Track birthdays and anniversaries with lunar/solar dates, countdowns, reminders, and iCal export.",
   "main": "main.js",
   "scripts": {
