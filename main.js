@@ -4,7 +4,7 @@ const { Plugin, ItemView, WorkspaceLeaf, Modal, Notice, Menu, PluginSettingTab, 
 // 【可编辑区】版本 / 更新说明 / 授权 — 与 BrainCore 一样，改这里即可
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const PLUGIN_VERSION = "4.0.13";
+const PLUGIN_VERSION = "4.0.14";
 // 发行版本标记，取值 personal | public。与 PLUGIN_REQUIRE_LICENSE 是两个独立维度：
 // 这个决定「给谁用、预填什么数据」（个人版 = 个人纪念事项，公版 = 3 条示例），
 // PLUGIN_REQUIRE_LICENSE 决定「要不要激活码」。公版（免激活）就是 public + false。
@@ -17,6 +17,9 @@ const PLUGIN_INTRO = "这是一个专为 Obsidian 开发的纪念日管理软件
 
 /** 按版本维护；弹窗默认展开最新版，历史版本点击展开 */
 const PLUGIN_CHANGELOG = {
+  "4.0.14": [
+    "设置：体验包激活后标题显示「公版」，不再写「48小时体验版」",
+  ],
   "4.0.13": [
     "审核：manifest 英文 description；README 市场名统一为 jinianri；版本对齐",
   ],
@@ -13776,17 +13779,21 @@ var import_obsidian3 = require("obsidian");
 var import_obsidian2 = require("obsidian");
 
 // src/edition-label.ts
-function getEditionLabel() {
-  if (isTrialEdition()) return "48\u5C0F\u65F6\u4F53\u9A8C\u7248";
+function getEditionLabel(settings) {
+  if (isTrialEdition()) {
+    if (settings == null ? void 0 : settings.licenseActivated) return "\u516C\u7248";
+    return "48\u5C0F\u65F6\u4F53\u9A8C\u7248";
+  }
   return isLicenseEnforced() ? "\u516C\u7248" : "\u4E2A\u4EBA\u7248";
 }
-function renderEditionBadge(parent) {
-  const label = getEditionLabel();
+function renderEditionBadge(parent, settings) {
+  const label = getEditionLabel(settings);
+  const activated = !!(settings == null ? void 0 : settings.licenseActivated);
   parent.createSpan({
     cls: "jnr-edition-badge",
     text: label,
     attr: {
-      title: isTrialEdition() ? "48 \u5C0F\u65F6\u5168\u529F\u80FD\u8BD5\u7528" : isLicenseEnforced() ? "\u9700\u6FC0\u6D3B\u540E\u4F7F\u7528\u5168\u90E8\u529F\u80FD" : "\u5DF2\u5185\u7F6E\u6388\u6743\uFF0C\u53EF\u76F4\u63A5\u4F7F\u7528"
+      title: isTrialEdition() ? activated ? "\u5DF2\u6FC0\u6D3B\uFF0C\u6309\u516C\u7248\u4F7F\u7528" : "48 \u5C0F\u65F6\u5168\u529F\u80FD\u8BD5\u7528" : isLicenseEnforced() ? "\u9700\u6FC0\u6D3B\u540E\u4F7F\u7528\u5168\u90E8\u529F\u80FD" : "\u5DF2\u5185\u7F6E\u6388\u6743\uFF0C\u53EF\u76F4\u63A5\u4F7F\u7528"
     }
   });
 }
@@ -15287,7 +15294,7 @@ var MobileDashboardModal = class extends import_obsidian10.Modal {
     const topBar = contentEl.createDiv({ cls: "jnr-mobile-topbar" });
     const titleWrap = topBar.createDiv({ cls: "jnr-mobile-title-wrap" });
     titleWrap.createSpan({ cls: "jnr-mobile-title", text: "\u7EAA\u5FF5\u65E5" });
-    renderEditionBadge(titleWrap);
+    renderEditionBadge(titleWrap, this.plugin.settings);
     const closeBtn = topBar.createEl("button", {
       cls: "clickable-icon jnr-mobile-close",
       attr: { "aria-label": "\u5173\u95ED" }
@@ -15878,7 +15885,7 @@ var JinianriSettingTab = class extends import_obsidian15.PluginSettingTab {
       applyMobileSettingsLayout(containerEl, true);
     }
     if (!isMobile) {
-      new import_obsidian15.Setting(containerEl).setName(formatPluginSettingsTitle("\u7EAA\u5FF5\u65E5 \u914D\u7F6E", getEditionLabel())).setHeading();
+      new import_obsidian15.Setting(containerEl).setName(formatPluginSettingsTitle("\u7EAA\u5FF5\u65E5 \u914D\u7F6E", getEditionLabel(this.plugin.settings))).setHeading();
     }
     const locked = isLicenseEnforced() && !this.plugin.isLicensed();
     const tabDefs = [];

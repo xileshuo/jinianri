@@ -1,7 +1,7 @@
 # jinianri
 > **付费 · 48 小时试用 · ¥29.9 永久激活**
 Obsidian 生日与纪念日插件（LifeOS）。阴历/阳历、侧边栏倒计时、三档提醒、iCal 导出。插件市场显示名：jinianri。
-当前公开版本：**4.0.13 · 48 小时试用**
+当前公开版本：**4.0.14 · 48 小时试用**
 ## 定价与购买
 | 项目 | 说明 |
 | --- | --- |
@@ -199,6 +199,10 @@ https://github.com/xileshuo/jinianri
 
 打开 Obsidian → 点击日历爱心图标 → 激活后管理你的重要日期 → 到点自动提醒，不再错过。
 ## 更新日志
+### 4.0.14
+
+- 设置：体验包激活后标题显示「公版」，不再写「48小时体验版」
+
 ### 4.0.13
 
 - 审核：manifest 英文 description；README 市场名统一为 jinianri；版本对齐
@@ -233,11 +237,6 @@ https://github.com/xileshuo/jinianri
 
 - 社区审核：去掉运行时注入 style / 内联样式；设置标题改用 Setting.setHeading()
 - 构建：公开仓 plugin-header 与 48h 体验包一致，通过 Build verification
-
-### 4.0.6
-
-- 社区审核：公开 README 英文 Installation / Usage 前置；去掉 :has 选择器
-- 样式：手机全屏看板高度去掉重复声明，减少 CSS lint 警告
 ---
 ## 分发说明
 本仓库用于社区插件 / BRAT / GitHub Release 分发与产品介绍，并附带 `src/` 等源码便于社区审核。
@@ -253,7 +252,7 @@ https://github.com/xileshuo/jinianri
 
 jinianri is a paid LifeOS plugin for birthdays and memorial dates in Obsidian, with lunar/solar calendars, sidebar countdowns, multi-level reminders, and iCal export.
 
-Current public build: **4.0.13** (48-hour trial).
+Current public build: **4.0.14** (48-hour trial).
 
 ## LifeOS family
 

@@ -28,7 +28,7 @@ export class MobileDashboardModal extends Modal {
     const topBar = contentEl.createDiv({ cls: "jnr-mobile-topbar" });
     const titleWrap = topBar.createDiv({ cls: "jnr-mobile-title-wrap" });
     titleWrap.createSpan({ cls: "jnr-mobile-title", text: "纪念日" });
-    renderEditionBadge(titleWrap);
+    renderEditionBadge(titleWrap, this.plugin.settings);
 
     const closeBtn = topBar.createEl("button", {
       cls: "clickable-icon jnr-mobile-close",

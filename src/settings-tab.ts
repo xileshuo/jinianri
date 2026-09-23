@@ -48,7 +48,7 @@ export class JinianriSettingTab extends PluginSettingTab {
 
     if (!isMobile) {
       new Setting(containerEl)
-        .setName(formatPluginSettingsTitle("纪念日 配置", getEditionLabel()))
+        .setName(formatPluginSettingsTitle("纪念日 配置", getEditionLabel(this.plugin.settings)))
         .setHeading();
     }
 
