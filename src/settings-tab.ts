@@ -41,9 +41,10 @@ export class JinianriSettingTab extends PluginSettingTab {
     containerEl.empty();
     containerEl.addClass("jnr-settings-compact");
     const isMobile = isMobileSettingsContext(this.app);
+    // 桌面也挂 host，设置页无痕滚动
+    applyMobileSettingsLayout(containerEl, isMobile);
     if (isMobile) {
       containerEl.addClass("jnr-settings-mobile");
-      applyMobileSettingsLayout(containerEl, true);
     }
 
     if (!isMobile) {

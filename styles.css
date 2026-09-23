@@ -1048,7 +1048,13 @@
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
+  scrollbar-width: none;
   -ms-overflow-style: none;
+}
+.jnr-card-list::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .jnr-sidebar-body {
@@ -4751,3 +4757,35 @@
   font-weight: 700;
 }
 
+/* ─── 无痕滚动：设置页与面板 ─── */
+.jnr-settings-host,
+.jnr-settings-host.vertical-tab-content,
+.vertical-tab-content.jnr-settings-host,
+.vertical-tab-content-container:has(.jnr-settings-host),
+.modal.mod-settings .vertical-tab-content:has(.jnr-settings-tab-bar),
+.modal.mod-settings .vertical-tab-content-container:has(.jnr-settings-tab-bar),
+.jnr-settings-panels,
+.jnr-settings-panel,
+.jnr-settings-compact,
+.jnr-dashboard-content,
+.jnr-sidebar,
+.jnr-mobile-dashboard-root {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.jnr-settings-host::-webkit-scrollbar,
+.jnr-settings-host.vertical-tab-content::-webkit-scrollbar,
+.vertical-tab-content.jnr-settings-host::-webkit-scrollbar,
+.vertical-tab-content-container:has(.jnr-settings-host)::-webkit-scrollbar,
+.modal.mod-settings .vertical-tab-content:has(.jnr-settings-tab-bar)::-webkit-scrollbar,
+.modal.mod-settings .vertical-tab-content-container:has(.jnr-settings-tab-bar)::-webkit-scrollbar,
+.jnr-settings-panels::-webkit-scrollbar,
+.jnr-settings-panel::-webkit-scrollbar,
+.jnr-settings-compact::-webkit-scrollbar,
+.jnr-dashboard-content::-webkit-scrollbar,
+.jnr-sidebar::-webkit-scrollbar,
+.jnr-mobile-dashboard-root::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}

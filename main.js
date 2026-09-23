@@ -15853,12 +15853,14 @@ function getPluginIcsPath(app) {
 // src/settings-mobile-layout.ts
 function applyMobileSettingsLayout(containerEl, isMobile) {
   var _a, _b;
-  document.querySelectorAll(".jnr-settings-mobile-host").forEach((el) => {
+  document.querySelectorAll(".jnr-settings-mobile-host, .jnr-settings-host").forEach((el) => {
     el.removeClass("jnr-settings-mobile-host");
+    el.removeClass("jnr-settings-host");
   });
-  if (!isMobile) return;
   injectMobileSettingsStyles();
   const host = (_b = (_a = containerEl.closest(".vertical-tab-content")) != null ? _a : containerEl.closest(".vertical-tab-content-container")) != null ? _b : containerEl.parentElement;
+  host == null ? void 0 : host.addClass("jnr-settings-host");
+  if (!isMobile) return;
   host == null ? void 0 : host.addClass("jnr-settings-mobile-host");
   appendMobileTopSpacer(containerEl);
 }
@@ -15883,9 +15885,9 @@ var JinianriSettingTab = class extends import_obsidian15.PluginSettingTab {
     containerEl.empty();
     containerEl.addClass("jnr-settings-compact");
     const isMobile = isMobileAppContext(this.app);
+    applyMobileSettingsLayout(containerEl, isMobile);
     if (isMobile) {
       containerEl.addClass("jnr-settings-mobile");
-      applyMobileSettingsLayout(containerEl, true);
     }
     if (!isMobile) {
       new import_obsidian15.Setting(containerEl).setName(formatPluginSettingsTitle("\u7EAA\u5FF5\u65E5 \u914D\u7F6E", getEditionLabel(this.plugin.settings))).setHeading();
