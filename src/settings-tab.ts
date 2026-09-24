@@ -3,7 +3,7 @@ import type JinianriPlugin from "./main";
 import { attachDateWheelButton } from "./date-wheel-picker";
 import { EventModal } from "./event-modal";
 import { isSampleOnlyData } from "./vault-data";
-import { getPluginSettingsPath } from "./plugin-paths";
+import { getPluginSettingsPath, openPluginConfigFile } from "./plugin-paths";
 import { showConfirm } from "./confirm-modal";
 import { getEditionLabel } from "./edition-label";
 import { openUsageGuideInNewTab } from "./usage-guide";
@@ -16,9 +16,11 @@ import {
 import { combineEventName, parseEventName } from "./name-utils";
 import { applyMobileSettingsLayout, isMobileSettingsContext } from "./settings-mobile-layout";
 import { renderLifeOsAboutPanel, renderLifeOsLicenseSettingsPanel } from "./lifeos-suite";
-import { formatPluginSettingsTitle } from "./lifeos-ui-shared";
+import { formatPluginSettingsTitle, renderLifeOsEmptyState } from "./lifeos-ui-shared";
 import { setLeapDayFallback } from "./date-utils";
 import type { AnniversaryEvent, CalendarType, EventGroup, RecurrenceType } from "./types";
+
+declare const PLUGIN_PHILOSOPHY_SUBTITLE: string | undefined;
 
 export type SettingsTabId = "license" | "reminder" | "events" | "general" | "data" | "about";
 
@@ -47,13 +49,31 @@ export class JinianriSettingTab extends PluginSettingTab {
       containerEl.addClass("jnr-settings-mobile");
     }
 
+    // 桌面：顶栏标题（与 CSS .jnr-settings-page-title 对齐；勿用 Setting.setHeading，部分主题会压成空白）
     if (!isMobile) {
-      new Setting(containerEl)
-        .setName(formatPluginSettingsTitle("纪念日 配置", getEditionLabel(this.plugin.settings)))
-        .setHeading();
+      containerEl.createEl("h2", {
+        cls: "jnr-settings-page-title",
+        text: formatPluginSettingsTitle("纪念日 配置", getEditionLabel(this.plugin.settings)),
+      });
     }
 
     const locked = isLicenseEnforced() && !this.plugin.isLicensed();
+    const introText =
+      typeof PLUGIN_PHILOSOPHY_SUBTITLE === "string" ? PLUGIN_PHILOSOPHY_SUBTITLE.trim() : "";
+    if (introText) {
+      const introEl = containerEl.createEl("p", { cls: "jnr-settings-intro", text: introText });
+      introEl.style.setProperty("margin", "0 0 6px", "important");
+      introEl.style.setProperty("padding", "0", "important");
+      introEl.style.setProperty("text-indent", "4em", "important");
+      introEl.style.setProperty("line-height", "1.35", "important");
+      introEl.style.setProperty("font-size", "12px", "important");
+    }
+    if (locked) {
+      containerEl.createEl("p", {
+        cls: "jnr-settings-locked-hint",
+        text: "未激活时仅可使用「授权」「数据」「关于」；完成激活后解锁全部设置。",
+      });
+    }
     const tabDefs: { id: SettingsTabId; label: string }[] = [];
     if (isLicenseEnforced()) tabDefs.push({ id: "license", label: "授权" });
     if (!locked) {
@@ -328,21 +348,23 @@ export class JinianriSettingTab extends PluginSettingTab {
       text: "到点后检查未提醒过的事项。当天本身会单独弹一次，和提前 30 / 15 / 7 天是两回事。改时间后立刻按新时间生效。",
     });
 
-    new Setting(card)
-      .setName("测试提醒")
-      .setDesc("只测弹窗渠道，不走每日时间和档位")
-      .addButton((btn) =>
-        btn.setButtonText("发送测试").onClick(() => this.plugin.sendTestReminder())
-      );
-
-    new Setting(card)
-      .setName("再弹今天")
-      .setDesc("今天已经记为提醒过、但没看到弹窗时用（弹窗常被设置页挡住）")
-      .addButton((btn) =>
-        btn.setButtonText("再弹一次").onClick(() => {
-          this.plugin.reminderService?.replayTodayReminders();
-        })
-      );
+    const testRow = card.createDiv({ cls: "jnr-settings-inline-actions jnr-reminder-test-row" });
+    testRow
+      .createEl("button", { text: "发送测试", cls: "jnr-text-btn", attr: { type: "button" } })
+      .addEventListener("click", () => this.plugin.sendTestReminder());
+    testRow
+      .createEl("button", { text: "再弹一次", cls: "jnr-text-btn", attr: { type: "button" } })
+      .addEventListener("click", () => {
+        if (!this.plugin.reminderService) {
+          new Notice("提醒服务未启动，请先激活或重载插件");
+          return;
+        }
+        this.plugin.reminderService.replayTodayReminders();
+      });
+    card.createEl("p", {
+      cls: "jnr-settings-section-hint",
+      text: "「发送测试」只测弹窗渠道；「再弹一次」清掉今天已读并再弹（会先关闭设置页，避免弹窗被挡住）。",
+    });
   }
 
   private renderOnboarding(parent: HTMLElement): void {
@@ -443,7 +465,12 @@ export class JinianriSettingTab extends PluginSettingTab {
         .sort((a, b) => a.sortOrder - b.sortOrder);
 
       if (events.length === 0) {
-        block.createDiv({ cls: "jnr-settings-group-empty", text: "暂无事项，点击 + 事项 添加" });
+        renderLifeOsEmptyState(block.createDiv(), {
+          icon: "📌",
+          message: "暂无事项，点击 + 事项 添加",
+          ctaLabel: "+ 事项",
+          onCta: () => this.openEventModal(null, groupId),
+        });
         continue;
       }
 
@@ -458,18 +485,6 @@ export class JinianriSettingTab extends PluginSettingTab {
     const grid = panel.createDiv({ cls: "jnr-settings-grid" });
     const card = this.createBlock(grid, "通用", "状态栏、笔记嵌入与看板显示选项。");
 
-    if (Platform.isMobile) {
-      card.createEl("p", {
-        cls: "jnr-settings-section-hint",
-        text: "移动端无状态栏倒计时，可用 Ribbon 日历图标或命令「打开纪念日面板（全屏）」进入看板。",
-      });
-    }
-
-    card.createEl("p", {
-      cls: "jnr-settings-section-hint",
-      text: "看板支持列表 / 时间轴 / 月历三种视图。折叠分组、拖动排序与底部交互提示仅在 **列表** 视图；顶部筛选下拉适用于全部视图。",
-    });
-
     new Setting(card)
       .setName("状态栏")
       .addToggle((toggle) =>
@@ -482,13 +497,28 @@ export class JinianriSettingTab extends PluginSettingTab {
           })
       );
 
+    if (Platform.isMobile) {
+      card.createEl("p", {
+        cls: "jnr-settings-section-hint",
+        text: "移动端无状态栏倒计时，可用 Ribbon 日历图标或命令「打开纪念日面板（全屏）」进入看板。",
+      });
+    }
+
+    card.createEl("p", {
+      cls: "jnr-settings-section-hint",
+      text: "看板支持列表 / 时间轴 / 月历三种视图。折叠分组、拖动排序与底部交互提示仅在 **列表** 视图；顶部筛选下拉适用于全部视图。",
+    });
+
     this.addSubgroupTitle(card, "日期规则");
     new Setting(card)
       .setName("2 月 29 日")
-      .setDesc("阳历 2/29 的纪念日在非闰年落在哪天")
+      .setClass("jnr-settings-leap-row")
+      .setDesc(
+        "阳历生日/纪念日若落在 2 月 29 日，遇到非闰年没有这一天时：选「2 月 28 日」提前一天过（国内常见）；选「3 月 1 日」则顺延到第二天。"
+      )
       .addDropdown((dd) => {
-        dd.addOption("feb28", "落到 2 月 28 日（推荐）");
-        dd.addOption("mar1", "落到 3 月 1 日");
+        dd.addOption("feb28", "2 月 28 日");
+        dd.addOption("mar1", "3 月 1 日");
         dd.setValue(
           this.plugin.settings.leapDayFallback === "mar1" ? "mar1" : "feb28"
         );
@@ -500,10 +530,9 @@ export class JinianriSettingTab extends PluginSettingTab {
           this.plugin.refreshAll();
         });
       });
-
     card.createEl("p", {
       cls: "jnr-settings-section-hint",
-      text: "中文习惯多按 2 月 28 日过；选 3 月 1 日则顺延到下一天。",
+      text: "只影响阳历 2/29；农历与其它日期不受此选项影响。",
     });
 
     this.addSubgroupTitle(card, "笔记嵌入");
@@ -531,34 +560,39 @@ export class JinianriSettingTab extends PluginSettingTab {
     const settingsPath = getPluginSettingsPath(this.plugin.app);
     const eventsPath = this.plugin.dataStore.getEventsPath();
 
-    new Setting(card)
-      .setName("data.json")
-      .setClass("jnr-settings-action-row")
-      .addButton((btn) =>
-        btn.setButtonText("打开").onClick(() => void this.openSettingsFile())
-      );
+    // 自定义行：左说明+路径、右「打开」——避开 Setting 的 88px 标签列与 description:none
+    const addDataFileRow = (
+      label: string,
+      path: string,
+      onOpen: () => void | Promise<void>
+    ) => {
+      const row = card.createDiv({ cls: "jnr-settings-data-file-row" });
+      const text = row.createDiv({ cls: "jnr-settings-data-file-text" });
+      text.createDiv({ cls: "jnr-settings-data-file-label", text: label });
+      text.createDiv({ cls: "jnr-settings-data-file-path", text: path });
+      row
+        .createEl("button", {
+          text: "打开",
+          cls: "jnr-text-btn",
+          attr: { type: "button" },
+        })
+        .addEventListener("click", () => void onOpen());
+    };
 
-    card.createEl("p", {
-      cls: "jnr-settings-section-hint",
-      text: `提醒档位、分组名称等插件设置。\n${settingsPath}`,
-    });
-
-    new Setting(card)
-      .setName("events.json")
-      .setClass("jnr-settings-action-row")
-      .addButton((btn) =>
-        btn.setButtonText("打开").onClick(() => void this.plugin.dataStore.openEventsFile())
-      );
-
-    card.createEl("p", {
-      cls: "jnr-settings-section-hint",
-      text: `全部纪念事项数据，随库 / iCloud 同步。\n${eventsPath}`,
-    });
+    addDataFileRow("提醒档位、分组名称等插件设置。", settingsPath, () =>
+      this.openSettingsFile()
+    );
+    addDataFileRow("全部纪念事项数据，随库 / iCloud 同步。", eventsPath, () =>
+      this.plugin.dataStore.openEventsFile()
+    );
   }
 
   private async confirmImportFromMarkdown(): Promise<void> {
     const events = await this.plugin.dataStore.importFromMarkdown(false);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+      new Notice("未在 纪念日.md 中找到可导入内容");
+      return;
+    }
 
     const current = this.plugin.events.length;
     const message =
@@ -580,12 +614,8 @@ export class JinianriSettingTab extends PluginSettingTab {
   private async openSettingsFile(): Promise<void> {
     const path = getPluginSettingsPath(this.plugin.app);
     await this.plugin.rewriteSettingsOnly();
-    const file = this.plugin.app.vault.getAbstractFileByPath(path);
-    if (file) {
-      await this.plugin.app.workspace.getLeaf().openFile(file);
-      return;
-    }
-    new Notice(`设置文件：${path}`);
+    const opened = await openPluginConfigFile(this.plugin.app, path);
+    if (!opened) new Notice(`设置文件：${path}`);
   }
 
   private renderTableHeader(list: HTMLElement): void {

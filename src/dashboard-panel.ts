@@ -37,7 +37,7 @@ import { attachPointerDrag } from "./pointer-drag";
 import type { AnniversaryComputed, EventGroup } from "./types";
 import { debounce } from "./utils/debounce";
 import { injectActivationPanelStyles, renderActivationPanel } from "./activation-panel";
-import { injectLifeOsSharedStyles, renderLifeOsEmptyState } from "./lifeos-ui-shared";
+import { injectLifeOsSharedStyles, renderLifeOsEmptyState, showLifeOsFirstRunCard, getLifeOsVaultKey } from "./lifeos-ui-shared";
 import { renderTrialBanner } from "./lifeos-trial";
 import { getSidebarInteractionHint, getSidebarSettingsHintLines } from "./sidebar-hints";
 import { isSampleOnlyData } from "./vault-data";
@@ -103,6 +103,16 @@ export class DashboardPanel {
     injectLifeOsSharedStyles();
     const inset = this.bodyEl.createDiv({ cls: "lifeos-sidebar-inset jnr-sidebar-inset" });
     renderTrialBanner(inset, this.plugin);
+    showLifeOsFirstRunCard(inset, this.plugin.app, getLifeOsVaultKey(this.plugin.app, "jnr-first-run"), {
+      title: "欢迎使用纪念日",
+      bullets: [
+        "点「+」添加生日、恋爱纪念日等重要日期",
+        "设置 → 提醒：到点库内弹窗 / 系统通知",
+        "侧边栏支持列表、时间轴、月历三种视图",
+      ],
+      primaryLabel: "添加第一条",
+      onPrimary: () => this.plugin.openAddEventModal(),
+    });
 
     const viewMode = this.getViewMode();
     const baseItems = this.getBaseVisibleItems();

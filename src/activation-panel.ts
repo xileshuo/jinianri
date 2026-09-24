@@ -15,9 +15,12 @@ import { injectLifeOsActivationStyles, renderLifeOsActivationPanel } from "./lif
 import { startTrialFromActivationPanel } from "./lifeos-trial";
 
 declare const PLUGIN_DISPLAY_NAME: string | undefined;
+declare const PLUGIN_PHILOSOPHY_SUBTITLE: string | undefined;
 
 const PLUGIN_PHILOSOPHY =
-  "记录生日、恋爱、婚姻等重要日期，自动计算「已过时长」与「距离下次还有几天」，支持三档提醒与 iCal 导出。";
+  typeof PLUGIN_PHILOSOPHY_SUBTITLE === "string" && PLUGIN_PHILOSOPHY_SUBTITLE.trim()
+    ? PLUGIN_PHILOSOPHY_SUBTITLE.trim()
+    : "记录生日、恋爱、婚姻等重要日期，自动计算「已过时长」与「距离下次还有几天」，支持三档提醒与 iCal 导出。";
 
 function getPluginDisplayName(): string {
   return typeof PLUGIN_DISPLAY_NAME === "string" && PLUGIN_DISPLAY_NAME ? PLUGIN_DISPLAY_NAME : "纪念日";

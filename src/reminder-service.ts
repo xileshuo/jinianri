@@ -190,15 +190,42 @@ export class ReminderService {
 
   /** 清掉今天的已读并立刻再弹（设置页挡住弹窗时用） */
   replayTodayReminders(): void {
+    if (!this.plugin.isLicensed()) {
+      new Notice("请先激活后再试");
+      return;
+    }
     const today = formatYmd(new Date());
     const suffix = `:today:${today}`;
+    const before = this.plugin.settings.sentReminderKeys.length;
     this.plugin.settings.sentReminderKeys =
       this.plugin.settings.sentReminderKeys.filter(
         (key) => !key.endsWith(suffix)
       );
     this.alreadySentHintDay = "";
-    void this.plugin.saveSettings();
-    this.checkReminders(true);
+    this.noChannelNoticeDay = "";
+
+    // 设置页会挡住库内弹窗：先关设置，再检查
+    try {
+      this.plugin.app.setting?.close?.();
+    } catch {
+      /* ignore */
+    }
+
+    void this.plugin.saveSettings().then(() => {
+      window.setTimeout(() => {
+        const pendingBefore = this.collectPending();
+        if (pendingBefore.length === 0) {
+          new Notice(
+            before === this.plugin.settings.sentReminderKeys.length
+              ? "今天没有需要再弹的纪念日提醒（没有「就是今天」的事项，或提醒已关）"
+              : "已清除今日「已提醒」标记，但当前没有待提醒事项",
+            5000
+          );
+          return;
+        }
+        this.checkReminders(true);
+      }, 120);
+    });
   }
 
   /** 后台挂起跨日后回到前台，再检查一轮未发过的提醒 */

@@ -4,7 +4,7 @@ const { Plugin, ItemView, WorkspaceLeaf, Modal, Notice, Menu, PluginSettingTab, 
 // 【可编辑区】版本 / 更新说明 / 授权 — 与 BrainCore 一样，改这里即可
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const PLUGIN_VERSION = "4.0.15";
+const PLUGIN_VERSION = "4.0.17";
 // 发行版本标记，取值 personal | public。与 PLUGIN_REQUIRE_LICENSE 是两个独立维度：
 // 这个决定「给谁用、预填什么数据」（个人版 = 个人纪念事项，公版 = 3 条示例），
 // PLUGIN_REQUIRE_LICENSE 决定「要不要激活码」。公版（免激活）就是 public + false。
@@ -15,8 +15,19 @@ const PLUGIN_TRIAL_HOURS = 48;
 const PLUGIN_DISPLAY_NAME = "纪念日";
 const PLUGIN_INTRO = "这是一个专为 Obsidian 开发的纪念日管理软件。";
 
+/** 设置页 / 激活页理念介绍（对齐 PlainLedger · BrainCore） */
+const PLUGIN_PHILOSOPHY_SUBTITLE =
+  "记录生日、恋爱、婚姻等重要日期，自动计算「已过时长」与「距离下次还有几天」，支持三档提醒与 iCal 导出。";
+
 /** 按版本维护；弹窗默认展开最新版，历史版本点击展开 */
 const PLUGIN_CHANGELOG = {
+  "4.0.17": [
+    "体验：首启 / 套装提示可点「去了解」；提醒重放与导入提示更稳",
+    "设置：数据文件行布局对齐 LifeOS；手机设置顶距与侧栏一致",
+  ],
+  "4.0.16": [
+    "版本对齐：公版 / 体验包与 LifeOS 同步发布",
+  ],
   "4.0.15": [
     "审核：manifest.description 改以英文句号结尾（Scorecard 不认中文 。）",
   ],

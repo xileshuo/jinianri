@@ -1869,13 +1869,13 @@
 }
 
 .jnr-settings-intro {
-  margin: 0 0 12px;
+  margin: 0 0 6px;
   padding: 0;
   font-size: 12px;
-  line-height: 1.55;
+  line-height: 1.35;
   color: var(--text-muted);
   opacity: 1;
-  padding-left: 2em;
+  text-indent: 4em;
 }
 
 .jnr-settings-compact .jnr-settings-block h3 {
@@ -2294,15 +2294,30 @@
 
 .jnr-settings-compact .jnr-settings-inline-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   margin-top: 4px;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .jnr-settings-compact .jnr-settings-inline-actions button {
-  padding: 5px 14px;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 160px;
+  padding: 0 14px;
   border-radius: 8px;
   font-size: 13px;
+  font-weight: 600;
+  height: 36px;
+  min-height: 36px;
+  line-height: 36px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.jnr-settings-compact .jnr-reminder-test-row {
+  margin: 8px 0 4px;
 }
 
 .jnr-settings-compact .jnr-settings-actions-row {
@@ -3608,9 +3623,28 @@
   border: none;
 }
 .lifeos-philosophy-intro,
-.jnr-update-subtitle,
-.jnr-settings-intro {
+.jnr-update-subtitle {
   padding-left: 2em;
+}
+.jnr-settings-intro {
+  margin: 0 0 6px !important;
+  padding: 0 0 0 12px !important;
+  border-left: 2px solid var(--lifeos-accent, #b48246);
+  text-indent: 4em !important;
+  line-height: 1.35 !important;
+  font-size: 12px !important;
+}
+.lifeos-act-btn,
+.lifeos-act-btn-primary,
+.lifeos-first-run-actions button,
+.lifeos-empty-cta {
+  transition: transform 100ms ease, opacity 100ms ease;
+}
+.lifeos-act-btn:active,
+.lifeos-act-btn-primary:active,
+.lifeos-first-run-actions button:active,
+.lifeos-empty-cta:active {
+  transform: scale(0.97);
 }
 .lifeos-error,
 .jnr-activation-status.error {
@@ -4007,20 +4041,23 @@
 }
 .lifeos-act-row{
   display:flex;
-  align-items:stretch;
+  align-items:center;
   gap:6px;
   width:100%;
 }
 .lifeos-act-input{
   flex:1 1 auto;
   min-width:0;
+  height:36px;
   box-sizing:border-box;
-  padding:8px 10px;
+  padding:0 10px;
   border-radius:8px;
   font-size:12px;
+  line-height:36px;
   background:var(--background-primary);
   border:1px solid var(--background-modifier-border);
   color:var(--text-normal);
+  text-align:center;
 }
 .lifeos-act-input.lifeos-act-fp{
   font-family:SFMono-Regular,Menlo,monospace;
@@ -4029,17 +4066,28 @@
   border-style:dashed;
   text-align:center;
 }
+.lifeos-act-input.lifeos-act-key{
+  font-weight:500;
+  text-align:center;
+}
 .lifeos-act-btn{
   flex:0 0 auto;
+  align-self:center;
+  min-width:52px;
+  min-height:36px;
+  height:36px;
   border-radius:8px;
-  padding:8px 12px;
+  padding:0 14px;
   font-size:12px;
   font-weight:700;
+  line-height:36px;
   white-space:nowrap;
   cursor:pointer;
   border:1px solid var(--background-modifier-border);
   background:var(--background-modifier-hover);
   color:var(--text-normal);
+  box-sizing:border-box;
+  text-align:center;
 }
 .lifeos-act-btn-primary{
   background:var(--lifeos-accent,var(--interactive-accent));
@@ -4153,10 +4201,15 @@
   margin-bottom:0;
 }
 .lifeos-license-status{
-  margin:8px 0 0;
+  display:block;
+  width:100%;
+  margin:10px 0 0;
+  padding:0;
   font-size:12px;
   font-weight:600;
+  line-height:1.45;
   color:var(--text-accent);
+  text-align:center;
 }
 .lifeos-license-trial-hint{
   margin:0 0 8px;
@@ -4186,13 +4239,16 @@
 }
 .lifeos-about-link-row button{
   flex-shrink:0;
+  min-width:52px;
   padding:0 14px;
   font-size:12px;
+  font-weight:700;
   border-radius:8px;
   min-height:28px;
   height:28px;
   line-height:28px;
   box-sizing:border-box;
+  text-align:center;
 }
 .lifeos-about-meta{
   margin:0 0 6px;
@@ -4788,4 +4844,277 @@
   display: none;
   width: 0;
   height: 0;
+}
+
+/* ─── Apple-style: 介绍紧凑 + 首行缩进 + 6 Tab 三列两行 + 手机 setting 同行 ─── */
+.jnr-settings-intro {
+  margin: 0 0 6px !important;
+  padding: 0 !important;
+  text-indent: 4em !important;
+  line-height: 1.35 !important;
+  font-size: 12px !important;
+}
+.jnr-settings-mobile .jnr-mobile-top-spacer {
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  display: none !important;
+}
+.jnr-settings-mobile .jnr-settings-tab-bar,
+.jnr-settings-mobile .jnr-settings-tab-bar.is-many-tabs {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  margin-top: 6px !important;
+  margin-bottom: 12px !important;
+}
+.jnr-settings-mobile .jnr-settings-tab-bar button,
+.jnr-settings-mobile .jnr-settings-tab-bar.is-many-tabs button {
+  flex: 1 1 calc(33.333% - 6px) !important;
+  min-width: 0 !important;
+  max-width: calc(33.333% - 4px);
+  width: auto !important;
+  box-sizing: border-box !important;
+}
+
+.is-phone .jnr-settings-compact .setting-item:not(.setting-item-heading),
+.is-mobile .jnr-settings-compact .setting-item:not(.setting-item-heading),
+.jnr-settings-mobile .setting-item:not(.setting-item-heading) {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+.is-phone .jnr-settings-compact .setting-item:not(.setting-item-heading) .setting-item-info,
+.is-mobile .jnr-settings-compact .setting-item:not(.setting-item-heading) .setting-item-info,
+.jnr-settings-mobile .setting-item:not(.setting-item-heading) .setting-item-info {
+  flex: 0 1 auto !important;
+  width: auto !important;
+  min-width: 4em !important;
+  max-width: 42% !important;
+}
+.is-phone .jnr-settings-compact .setting-item:not(.setting-item-heading) .setting-item-control,
+.is-mobile .jnr-settings-compact .setting-item:not(.setting-item-heading) .setting-item-control,
+.jnr-settings-mobile .setting-item:not(.setting-item-heading) .setting-item-control {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  justify-content: flex-end !important;
+}
+
+.jnr-settings-compact .jnr-settings-block > .setting-item.setting-item-heading,
+.jnr-settings-compact > .setting-item.setting-item-heading {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+}
+.jnr-settings-compact .jnr-settings-block > .setting-item.setting-item-heading .setting-item-info,
+.jnr-settings-compact > .setting-item.setting-item-heading .setting-item-info {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+.jnr-settings-compact .jnr-settings-block > .setting-item.setting-item-heading .setting-item-name {
+  white-space: normal !important;
+}
+
+/* 操作行：文件名左、打开按钮右贴齐（压过手机端 control 拉满） */
+.is-phone .jnr-settings-compact .jnr-settings-action-row .setting-item-info,
+.is-mobile .jnr-settings-compact .jnr-settings-action-row .setting-item-info,
+.jnr-settings-mobile .jnr-settings-action-row .setting-item-info {
+  flex: 1 1 auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+.is-phone .jnr-settings-compact .jnr-settings-action-row .setting-item-control,
+.is-mobile .jnr-settings-compact .jnr-settings-action-row .setting-item-control,
+.jnr-settings-mobile .jnr-settings-action-row .setting-item-control {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  margin-left: 12px !important;
+}
+.is-phone .jnr-settings-compact .jnr-settings-action-row .setting-item-control button,
+.is-mobile .jnr-settings-compact .jnr-settings-action-row .setting-item-control button,
+.jnr-settings-mobile .jnr-settings-action-row .setting-item-control button {
+  min-width: 64px !important;
+  width: auto !important;
+  max-width: 88px !important;
+  min-height: 28px !important;
+  height: 28px !important;
+  padding: 0 14px !important;
+  flex: 0 0 auto !important;
+}
+
+/* 2月29日下拉缩短 */
+.jnr-settings-compact .jnr-settings-leap-row .setting-item-control select,
+.jnr-settings-compact .jnr-settings-leap-row .setting-item-control .dropdown,
+.jnr-settings-mobile .jnr-settings-leap-row .setting-item-control select,
+.jnr-settings-mobile .jnr-settings-leap-row .setting-item-control .dropdown {
+  width: 9.5em !important;
+  min-width: 9.5em !important;
+  max-width: 9.5em !important;
+  flex: 0 0 9.5em !important;
+}
+
+
+/* 数据页：左说明+路径 / 右「打开」，同一行垂直居中（不用 Setting，避开 88px 标签列） */
+.jnr-settings-compact .jnr-settings-data-file-row,
+.jnr-settings-mobile .jnr-settings-data-file-row,
+.is-phone .jnr-settings-compact .jnr-settings-data-file-row,
+.is-mobile .jnr-settings-compact .jnr-settings-data-file-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 9px 0 !important;
+  margin: 0 !important;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+.jnr-settings-compact .jnr-settings-data-file-row:last-child,
+.jnr-settings-mobile .jnr-settings-data-file-row:last-child {
+  border-bottom: none;
+}
+.jnr-settings-compact .jnr-settings-data-file-text,
+.jnr-settings-mobile .jnr-settings-data-file-text {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+.jnr-settings-compact .jnr-settings-data-file-label,
+.jnr-settings-mobile .jnr-settings-data-file-label {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  color: var(--text-normal) !important;
+  white-space: normal !important;
+}
+.jnr-settings-compact .jnr-settings-data-file-path,
+.jnr-settings-mobile .jnr-settings-data-file-path {
+  margin-top: 2px !important;
+  font-family: SFMono-Regular, Menlo, monospace !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  color: var(--text-muted) !important;
+  opacity: 0.9;
+  word-break: break-all !important;
+}
+.jnr-settings-compact .jnr-settings-data-file-row > button,
+.jnr-settings-mobile .jnr-settings-data-file-row > button {
+  flex: 0 0 auto !important;
+  align-self: center !important;
+  min-width: 64px !important;
+  width: auto !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 14px !important;
+  margin: 0 !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 28px !important;
+  box-sizing: border-box !important;
+}
+
+/* 2/29 闰日回落：露出说明，标签列放宽，下拉贴右 */
+.jnr-settings-compact .jnr-settings-leap-row,
+.jnr-settings-mobile .jnr-settings-leap-row,
+.is-phone .jnr-settings-compact .jnr-settings-leap-row,
+.is-mobile .jnr-settings-compact .jnr-settings-leap-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+.jnr-settings-compact .jnr-settings-leap-row .setting-item-info,
+.jnr-settings-mobile .jnr-settings-leap-row .setting-item-info,
+.is-phone .jnr-settings-compact .jnr-settings-leap-row .setting-item-info,
+.is-mobile .jnr-settings-compact .jnr-settings-leap-row .setting-item-info {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+.jnr-settings-compact .jnr-settings-leap-row .setting-item-name,
+.jnr-settings-mobile .jnr-settings-leap-row .setting-item-name {
+  white-space: nowrap !important;
+}
+.jnr-settings-compact .jnr-settings-leap-row .setting-item-description,
+.jnr-settings-mobile .jnr-settings-leap-row .setting-item-description {
+  display: block !important;
+  margin-top: 2px !important;
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+  color: var(--text-muted) !important;
+  white-space: normal !important;
+}
+.jnr-settings-compact .jnr-settings-leap-row .setting-item-control,
+.jnr-settings-mobile .jnr-settings-leap-row .setting-item-control,
+.is-phone .jnr-settings-compact .jnr-settings-leap-row .setting-item-control,
+.is-mobile .jnr-settings-compact .jnr-settings-leap-row .setting-item-control {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  margin-left: 12px !important;
+  align-self: center !important;
+}
+
+.jnr-settings-compact .jnr-settings-path-hint,
+.jnr-settings-mobile .jnr-settings-path-hint {
+  margin: 0 0 12px !important;
+  padding-left: 0 !important;
+  font-family: SFMono-Regular, Menlo, monospace;
+  font-size: 11px !important;
+  opacity: 0.85;
+}
+.is-phone .jnr-settings-compact .jnr-settings-action-row .setting-item-control button,
+.is-mobile .jnr-settings-compact .jnr-settings-action-row .setting-item-control button,
+.jnr-settings-mobile .jnr-settings-action-row .setting-item-control button {
+  min-width: 64px !important;
+  width: auto !important;
+  max-width: 88px !important;
+  min-height: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  padding: 0 14px !important;
+}
+.lifeos-act-row {
+  align-items: center !important;
+}
+.lifeos-act-input,
+.lifeos-act-btn {
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  line-height: 36px !important;
+  box-sizing: border-box !important;
+}
+.lifeos-act-input {
+  padding: 0 10px !important;
+  text-align: center !important;
+}
+.lifeos-about-work-actions {
+  justify-content: flex-end !important;
+}
+.lifeos-about-work-actions button,
+.lifeos-about-link-row button {
+  min-width: 64px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  line-height: 36px !important;
+  padding: 0 14px !important;
+}
+.lifeos-about-work-philosophy {
+  text-indent: 4em !important;
+  line-height: 1.35 !important;
+  margin-top: 2px !important;
 }

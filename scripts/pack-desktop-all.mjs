@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 /**
- * Pack 纪念日 四版到 Desktop/V{version}/（个人版 / 公版商 / 公版免激活 / 48小时体验版）
+ * Pack 纪念日 两版到 Desktop：个人版 / 公版48小时试用版
+ * Usage: node scripts/pack-desktop-all.mjs [outdir]
+ *
+ * 注意：esbuild 默认用 JNR_REQUIRE_LICENSE/JNR_TRIAL_HOURS 覆盖 header（公开仓默认 48h），
+ * 打包时必须传对应环境变量，仅改 plugin-header.js 不够。
  */
 import fs from "fs";
 import path from "path";
@@ -10,7 +14,9 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const VERSION = JSON.parse(fs.readFileSync(path.join(ROOT, "manifest.json"), "utf8")).version;
-const OUT = path.join(process.env.HOME || "", "Desktop", `V${VERSION.replace(/^v/i, "")}`);
+const OUT = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.join(process.env.HOME || "", "Desktop", `V${VERSION.replace(/^v/i, "")}`);
 const ASSETS = path.join(ROOT, "release-pack/assets");
 const CORE_FILES = ["manifest.json", "styles.css"];
 const HEADER_PATH = path.join(ROOT, "plugin-header.js");
@@ -23,6 +29,7 @@ function cp(src, dest) {
 
 function patchHeader(requireLicense, trialHours = 0, edition = "personal") {
   let code = fs.readFileSync(HEADER_PATH, "utf8");
+  code = code.replace(/const PLUGIN_VERSION = "[^"]+";/, `const PLUGIN_VERSION = "${VERSION}";`);
   code = code.replace(
     /const PLUGIN_EDITION = "[^"]+";/,
     `const PLUGIN_EDITION = "${edition}";`
@@ -44,7 +51,15 @@ function patchHeader(requireLicense, trialHours = 0, edition = "personal") {
 
 function writeMainJs(destDir, requireLicense, trialHours, edition) {
   patchHeader(requireLicense, trialHours, edition);
-  execSync("npm run build", { cwd: ROOT, stdio: "inherit" });
+  execSync("npm run build", {
+    cwd: ROOT,
+    stdio: "inherit",
+    env: {
+      ...process.env,
+      JNR_REQUIRE_LICENSE: String(requireLicense),
+      JNR_TRIAL_HOURS: String(trialHours),
+    },
+  });
   execSync(`node --check "${path.join(ROOT, "main.js")}"`, { stdio: "pipe" });
   cp(path.join(ROOT, "main.js"), path.join(destDir, "main.js"));
 }
@@ -81,32 +96,22 @@ packEdition(
 );
 
 packEdition(
-  `纪念日-v${VERSION}-公版（商）`,
-  "public",
-  true,
-  0,
-  "public",
-  baseReadme("公版（商）") + "\n- 预填 3 条示例纪念事项 · 需激活码\n"
-);
-
-packEdition(
-  `纪念日-v${VERSION}-公版（免激活）`,
-  "public",
-  false,
-  0,
-  "public",
-  baseReadme("公版（免激活）") + "\n- 预填 3 条示例纪念事项 · 无需激活码\n"
-);
-
-packEdition(
-  `纪念日-v${VERSION}-48小时体验版`,
+  `纪念日-v${VERSION}-公版48小时试用版`,
   "public",
   true,
   48,
   "public",
-  baseReadme("48小时体验版") + "\n- 预填 3 条示例纪念事项 · 48 小时全功能试用，到期须激活\n"
+  baseReadme("公版48小时试用版") + "\n- 预填 3 条示例纪念事项 · 48 小时全功能试用，到期须激活\n"
 );
 
 fs.writeFileSync(HEADER_PATH, originalHeader, "utf8");
-execSync("npm run build", { cwd: ROOT, stdio: "inherit" });
-console.log(`\n纪念日四包已输出到 ${OUT}`);
+execSync("npm run build", {
+  cwd: ROOT,
+  stdio: "inherit",
+  env: {
+    ...process.env,
+    JNR_REQUIRE_LICENSE: "true",
+    JNR_TRIAL_HOURS: "48",
+  },
+});
+console.log(`\n纪念日两包已输出到 ${OUT}`);

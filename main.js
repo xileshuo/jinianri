@@ -4,7 +4,7 @@ const { Plugin, ItemView, WorkspaceLeaf, Modal, Notice, Menu, PluginSettingTab, 
 // 【可编辑区】版本 / 更新说明 / 授权 — 与 BrainCore 一样，改这里即可
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const PLUGIN_VERSION = "4.0.15";
+const PLUGIN_VERSION = "4.0.17";
 // 发行版本标记，取值 personal | public。与 PLUGIN_REQUIRE_LICENSE 是两个独立维度：
 // 这个决定「给谁用、预填什么数据」（个人版 = 个人纪念事项，公版 = 3 条示例），
 // PLUGIN_REQUIRE_LICENSE 决定「要不要激活码」。公版（免激活）就是 public + false。
@@ -15,8 +15,19 @@ const PLUGIN_TRIAL_HOURS = 48;
 const PLUGIN_DISPLAY_NAME = "纪念日";
 const PLUGIN_INTRO = "这是一个专为 Obsidian 开发的纪念日管理软件。";
 
+/** 设置页 / 激活页理念介绍（对齐 PlainLedger · BrainCore） */
+const PLUGIN_PHILOSOPHY_SUBTITLE =
+  "记录生日、恋爱、婚姻等重要日期，自动计算「已过时长」与「距离下次还有几天」，支持三档提醒与 iCal 导出。";
+
 /** 按版本维护；弹窗默认展开最新版，历史版本点击展开 */
 const PLUGIN_CHANGELOG = {
+  "4.0.17": [
+    "体验：首启 / 套装提示可点「去了解」；提醒重放与导入提示更稳",
+    "设置：数据文件行布局对齐 LifeOS；手机设置顶距与侧栏一致",
+  ],
+  "4.0.16": [
+    "版本对齐：公版 / 体验包与 LifeOS 同步发布",
+  ],
   "4.0.15": [
     "审核：manifest.description 改以英文句号结尾（Scorecard 不认中文 。）",
   ],
@@ -13831,6 +13842,51 @@ function renderLifeOsEmptyState(parent, options) {
   }
   return wrap;
 }
+function showLifeOsFirstRunCard(container, app, storageKey, options) {
+  injectLifeOsSharedStyles();
+  try {
+    if (localStorage.getItem(storageKey) === "1") return null;
+  } catch (e) {
+  }
+  const card = container.createDiv({ cls: "lifeos-first-run-card" });
+  card.createEl("p", { cls: "lifeos-first-run-title", text: options.title || "\u6B22\u8FCE\u4F7F\u7528 LifeOS" });
+  const list = card.createEl("ul", { cls: "lifeos-first-run-list" });
+  (options.bullets || []).forEach((line) => list.createEl("li", { text: line }));
+  const actions = card.createDiv({ cls: "lifeos-first-run-actions" });
+  const dismiss = () => {
+    try {
+      localStorage.setItem(storageKey, "1");
+    } catch (e) {
+    }
+    card.remove();
+  };
+  if (options.primaryLabel) {
+    const primary = actions.createEl("button", {
+      cls: "lifeos-first-run-primary",
+      text: options.primaryLabel,
+      type: "button"
+    });
+    primary.onclick = () => {
+      var _a;
+      dismiss();
+      (_a = options.onPrimary) == null ? void 0 : _a.call(options);
+    };
+  }
+  if (options.secondaryLabel) {
+    const secondary = actions.createEl("button", {
+      cls: "lifeos-first-run-secondary",
+      text: options.secondaryLabel,
+      type: "button"
+    });
+    secondary.onclick = () => {
+      var _a;
+      dismiss();
+      (_a = options.onSecondary) == null ? void 0 : _a.call(options);
+    };
+  }
+  actions.createEl("button", { text: options.laterLabel || "\u77E5\u9053\u4E86", type: "button" }).onclick = dismiss;
+  return card;
+}
 function renderLifeOsActivationPreview(card, rows, note) {
   injectLifeOsSharedStyles();
   const preview = card.createDiv({ cls: "plg-activation-preview lifeos-activation-preview" });
@@ -13869,6 +13925,11 @@ function openLifeOsPluginSettings(app, pluginId) {
     if (!openTab()) new import_obsidian2.Notice("\u65E0\u6CD5\u6253\u5F00\u63D2\u4EF6\u8BBE\u7F6E\uFF0C\u8BF7\u624B\u52A8\u8FDB\u5165 \u8BBE\u7F6E \u2192 \u7B2C\u4E09\u65B9\u63D2\u4EF6");
   }, 80);
 }
+function getLifeOsVaultKey(app, suffix) {
+  var _a, _b;
+  const vaultName = ((_b = (_a = app.vault) == null ? void 0 : _a.getName) == null ? void 0 : _b.call(_a)) || "UnknownVault";
+  return `lifeos:${vaultName}:${suffix}`;
+}
 
 // src/lifeos-suite.ts
 var LIFEOS_PLUGIN_CATALOG = [
@@ -13900,7 +13961,7 @@ var LIFEOS_PLUGIN_CATALOG = [
 var LIFEOS_AUTHOR_NAME = "\u56CD\u6A02";
 var LIFEOS_COPYRIGHT = "\u6240\u6709\u7248\u6743\xA9\u56CD\u6A02\u8AAA\u3002\u4FDD\u7559\u6240\u6709\u6743\u5229\u3002";
 var LIFEOS_AUTHOR_HOMEPAGE = "https://xhslink.com/m/3uOoUHv2rI1";
-function getLifeOsVaultKey(app, suffix) {
+function getLifeOsVaultKey2(app, suffix) {
   var _a, _b;
   const vaultName = ((_b = (_a = app.vault) == null ? void 0 : _a.getName) == null ? void 0 : _b.call(_a)) || "UnknownVault";
   return `lifeos:${vaultName}:${suffix}`;
@@ -13921,16 +13982,39 @@ function maybeShowLifeOsSuitePrompt(app, selfId, selfName) {
     return true;
   }).map((p) => p.name);
   if (peers.length === 0) return;
-  const storageKey = getLifeOsVaultKey(app, "suitePromptSeen");
+  const storageKey = getLifeOsVaultKey2(app, "suitePromptSeen");
   try {
     if (localStorage.getItem(storageKey) === "1") return;
   } catch (e) {
   }
+  const peerText = peers.join("\u3001");
   window.setTimeout(() => {
-    new import_obsidian3.Notice(`${selfName} \u53EF\u4E0E ${peers.join("\u3001")} \u5E76\u6392\u4F7F\u7528\uFF0C\u6570\u636E\u5747\u4FDD\u5B58\u5728\u540C\u4E00 Obsidian \u5E93\u5185\u3002`, 8e3);
     try {
-      localStorage.setItem(storageKey, "1");
+      if (localStorage.getItem(storageKey) === "1") return;
     } catch (e) {
+    }
+    const markSeen = () => {
+      try {
+        localStorage.setItem(storageKey, "1");
+      } catch (e) {
+      }
+    };
+    try {
+      const modal = new import_obsidian3.Modal(app);
+      modal.setTitle("LifeOS \u5957\u88C5");
+      modal.contentEl.createEl("p", {
+        text: `${selfName} \u53EF\u4E0E ${peerText} \u5E76\u6392\u4F7F\u7528\uFF0C\u6570\u636E\u5747\u4FDD\u5B58\u5728\u540C\u4E00 Obsidian \u5E93\u5185\u3002`
+      });
+      const row = modal.contentEl.createDiv({ cls: "modal-button-container" });
+      const btn = row.createEl("button", { text: "\u77E5\u9053\u4E86", cls: "mod-cta", type: "button" });
+      btn.onclick = () => {
+        markSeen();
+        modal.close();
+      };
+      modal.open();
+    } catch (_) {
+      new import_obsidian3.Notice(`${selfName} \u53EF\u4E0E ${peerText} \u5E76\u6392\u4F7F\u7528\uFF0C\u6570\u636E\u5747\u4FDD\u5B58\u5728\u540C\u4E00 Obsidian \u5E93\u5185\u3002`, 8e3);
+      markSeen();
     }
   }, 2200);
 }
@@ -13940,6 +14024,10 @@ function openLifeOsExternalUrl(url) {
     window.open(url, "_blank");
   } catch (err) {
     console.warn("[LifeOS] open external url", err);
+    try {
+      new import_obsidian3.Notice("\u65E0\u6CD5\u6253\u5F00\u94FE\u63A5");
+    } catch (e) {
+    }
   }
 }
 function injectLifeOsActivationStyles() {
@@ -13953,7 +14041,7 @@ function renderLifeOsActivationPanel(container, config) {
   if (config.extraPanelClass) container.addClass(config.extraPanelClass);
   const wrap = container.createDiv({ cls: "lifeos-act-wrap" });
   const card = wrap.createDiv({ cls: "lifeos-act-card" });
-  card.createDiv({ cls: "lifeos-act-title", text: config.pluginName });
+  card.createEl("h2", { cls: "lifeos-act-title", text: config.pluginName });
   const statusText = ((_a = config.getStatusText) == null ? void 0 : _a.call(config)) || "";
   if (statusText) card.createEl("p", { cls: "lifeos-act-status", text: statusText });
   if (config.philosophy) card.createEl("p", { cls: "lifeos-act-philosophy lifeos-philosophy-intro", text: config.philosophy });
@@ -13992,7 +14080,7 @@ function renderLifeOsActivationPanel(container, config) {
   if (config.licenseKey) keyInput.value = config.licenseKey;
   const activateBtn = keyRow.createEl("button", {
     cls: "lifeos-act-btn lifeos-act-btn-primary",
-    text: config.activateShortLabel || "\u9A8C\u8BC1\u5E76\u6FC0\u6D3B",
+    text: config.activateShortLabel || "\u6FC0\u6D3B",
     type: "button"
   });
   const msgEl = card.createDiv({ cls: "lifeos-act-msg" });
@@ -14065,7 +14153,7 @@ function renderLifeOsLicenseSettingsPanel(panel, config) {
   });
   keyRow.createEl("button", {
     cls: "lifeos-act-btn lifeos-act-btn-primary",
-    text: "\u9A8C\u8BC1\u5E76\u6FC0\u6D3B",
+    text: "\u6FC0\u6D3B",
     type: "button"
   }).onclick = () => {
     var _a2;
@@ -14317,7 +14405,7 @@ function runJinianriTrialStartup(plugin, onDone) {
 }
 
 // src/activation-panel.ts
-var PLUGIN_PHILOSOPHY = "\u8BB0\u5F55\u751F\u65E5\u3001\u604B\u7231\u3001\u5A5A\u59FB\u7B49\u91CD\u8981\u65E5\u671F\uFF0C\u81EA\u52A8\u8BA1\u7B97\u300C\u5DF2\u8FC7\u65F6\u957F\u300D\u4E0E\u300C\u8DDD\u79BB\u4E0B\u6B21\u8FD8\u6709\u51E0\u5929\u300D\uFF0C\u652F\u6301\u4E09\u6863\u63D0\u9192\u4E0E iCal \u5BFC\u51FA\u3002";
+var PLUGIN_PHILOSOPHY = typeof PLUGIN_PHILOSOPHY_SUBTITLE === "string" && PLUGIN_PHILOSOPHY_SUBTITLE.trim() ? PLUGIN_PHILOSOPHY_SUBTITLE.trim() : "\u8BB0\u5F55\u751F\u65E5\u3001\u604B\u7231\u3001\u5A5A\u59FB\u7B49\u91CD\u8981\u65E5\u671F\uFF0C\u81EA\u52A8\u8BA1\u7B97\u300C\u5DF2\u8FC7\u65F6\u957F\u300D\u4E0E\u300C\u8DDD\u79BB\u4E0B\u6B21\u8FD8\u6709\u51E0\u5929\u300D\uFF0C\u652F\u6301\u4E09\u6863\u63D0\u9192\u4E0E iCal \u5BFC\u51FA\u3002";
 function getPluginDisplayName() {
   return typeof PLUGIN_DISPLAY_NAME === "string" && PLUGIN_DISPLAY_NAME ? PLUGIN_DISPLAY_NAME : "\u7EAA\u5FF5\u65E5";
 }
@@ -14521,6 +14609,16 @@ var DashboardPanel = class {
     injectLifeOsSharedStyles();
     const inset = this.bodyEl.createDiv({ cls: "lifeos-sidebar-inset jnr-sidebar-inset" });
     renderTrialBanner(inset, this.plugin);
+    showLifeOsFirstRunCard(inset, this.plugin.app, getLifeOsVaultKey(this.plugin.app, "jnr-first-run"), {
+      title: "\u6B22\u8FCE\u4F7F\u7528\u7EAA\u5FF5\u65E5",
+      bullets: [
+        "\u70B9\u300C+\u300D\u6DFB\u52A0\u751F\u65E5\u3001\u604B\u7231\u7EAA\u5FF5\u65E5\u7B49\u91CD\u8981\u65E5\u671F",
+        "\u8BBE\u7F6E \u2192 \u63D0\u9192\uFF1A\u5230\u70B9\u5E93\u5185\u5F39\u7A97 / \u7CFB\u7EDF\u901A\u77E5",
+        "\u4FA7\u8FB9\u680F\u652F\u6301\u5217\u8868\u3001\u65F6\u95F4\u8F74\u3001\u6708\u5386\u4E09\u79CD\u89C6\u56FE"
+      ],
+      primaryLabel: "\u6DFB\u52A0\u7B2C\u4E00\u6761",
+      onPrimary: () => this.plugin.openAddEventModal()
+    });
     const viewMode = this.getViewMode();
     const baseItems = this.getBaseVisibleItems();
     const visibleItems = this.applyViewFilters(baseItems, viewMode);
@@ -15849,6 +15947,42 @@ function getLegacyCombinedDataPath(app) {
 function getPluginIcsPath(app) {
   return (0, import_obsidian14.normalizePath)(`${app.vault.configDir}/plugins/${PLUGIN_ID}/data.ics`);
 }
+async function openPluginConfigFile(app, vaultPath) {
+  const path = (0, import_obsidian14.normalizePath)(String(vaultPath || ""));
+  if (!path) return false;
+  let file = app.vault.getAbstractFileByPath(path);
+  if (file instanceof import_obsidian14.TFile) {
+    await app.workspace.getLeaf(false).openFile(file);
+    return true;
+  }
+  const adapter = app.vault.adapter;
+  try {
+    if (typeof adapter.exists === "function" && !await adapter.exists(path)) {
+      new import_obsidian14.Notice(`\u6587\u4EF6\u4E0D\u5B58\u5728\uFF1A${path}`);
+      return false;
+    }
+  } catch (e) {
+  }
+  if (typeof app.openWithDefaultApp === "function") {
+    try {
+      await app.openWithDefaultApp(path);
+      return true;
+    } catch (e) {
+    }
+  }
+  if (typeof adapter.getFullPath === "function") {
+    try {
+      const full = adapter.getFullPath(path);
+      if (full && typeof window.require === "function") {
+        window.require("electron").shell.openPath(full);
+        return true;
+      }
+    } catch (e) {
+    }
+  }
+  new import_obsidian14.Notice(`\u8BF7\u7528\u6587\u4EF6\u7BA1\u7406\u5668\u6253\u5F00\uFF1A${path}`);
+  return false;
+}
 
 // src/settings-mobile-layout.ts
 function applyMobileSettingsLayout(containerEl, isMobile) {
@@ -15890,9 +16024,27 @@ var JinianriSettingTab = class extends import_obsidian15.PluginSettingTab {
       containerEl.addClass("jnr-settings-mobile");
     }
     if (!isMobile) {
-      new import_obsidian15.Setting(containerEl).setName(formatPluginSettingsTitle("\u7EAA\u5FF5\u65E5 \u914D\u7F6E", getEditionLabel(this.plugin.settings))).setHeading();
+      containerEl.createEl("h2", {
+        cls: "jnr-settings-page-title",
+        text: formatPluginSettingsTitle("\u7EAA\u5FF5\u65E5 \u914D\u7F6E", getEditionLabel(this.plugin.settings))
+      });
     }
     const locked = isLicenseEnforced() && !this.plugin.isLicensed();
+    const introText = typeof PLUGIN_PHILOSOPHY_SUBTITLE === "string" ? PLUGIN_PHILOSOPHY_SUBTITLE.trim() : "";
+    if (introText) {
+      const introEl = containerEl.createEl("p", { cls: "jnr-settings-intro", text: introText });
+      introEl.style.setProperty("margin", "0 0 6px", "important");
+      introEl.style.setProperty("padding", "0", "important");
+      introEl.style.setProperty("text-indent", "4em", "important");
+      introEl.style.setProperty("line-height", "1.35", "important");
+      introEl.style.setProperty("font-size", "12px", "important");
+    }
+    if (locked) {
+      containerEl.createEl("p", {
+        cls: "jnr-settings-locked-hint",
+        text: "\u672A\u6FC0\u6D3B\u65F6\u4EC5\u53EF\u4F7F\u7528\u300C\u6388\u6743\u300D\u300C\u6570\u636E\u300D\u300C\u5173\u4E8E\u300D\uFF1B\u5B8C\u6210\u6FC0\u6D3B\u540E\u89E3\u9501\u5168\u90E8\u8BBE\u7F6E\u3002"
+      });
+    }
     const tabDefs = [];
     if (isLicenseEnforced()) tabDefs.push({ id: "license", label: "\u6388\u6743" });
     if (!locked) {
@@ -16130,15 +16282,19 @@ var JinianriSettingTab = class extends import_obsidian15.PluginSettingTab {
       cls: "jnr-settings-section-hint",
       text: "\u5230\u70B9\u540E\u68C0\u67E5\u672A\u63D0\u9192\u8FC7\u7684\u4E8B\u9879\u3002\u5F53\u5929\u672C\u8EAB\u4F1A\u5355\u72EC\u5F39\u4E00\u6B21\uFF0C\u548C\u63D0\u524D 30 / 15 / 7 \u5929\u662F\u4E24\u56DE\u4E8B\u3002\u6539\u65F6\u95F4\u540E\u7ACB\u523B\u6309\u65B0\u65F6\u95F4\u751F\u6548\u3002"
     });
-    new import_obsidian15.Setting(card).setName("\u6D4B\u8BD5\u63D0\u9192").setDesc("\u53EA\u6D4B\u5F39\u7A97\u6E20\u9053\uFF0C\u4E0D\u8D70\u6BCF\u65E5\u65F6\u95F4\u548C\u6863\u4F4D").addButton(
-      (btn) => btn.setButtonText("\u53D1\u9001\u6D4B\u8BD5").onClick(() => this.plugin.sendTestReminder())
-    );
-    new import_obsidian15.Setting(card).setName("\u518D\u5F39\u4ECA\u5929").setDesc("\u4ECA\u5929\u5DF2\u7ECF\u8BB0\u4E3A\u63D0\u9192\u8FC7\u3001\u4F46\u6CA1\u770B\u5230\u5F39\u7A97\u65F6\u7528\uFF08\u5F39\u7A97\u5E38\u88AB\u8BBE\u7F6E\u9875\u6321\u4F4F\uFF09").addButton(
-      (btn) => btn.setButtonText("\u518D\u5F39\u4E00\u6B21").onClick(() => {
-        var _a;
-        (_a = this.plugin.reminderService) == null ? void 0 : _a.replayTodayReminders();
-      })
-    );
+    const testRow = card.createDiv({ cls: "jnr-settings-inline-actions jnr-reminder-test-row" });
+    testRow.createEl("button", { text: "\u53D1\u9001\u6D4B\u8BD5", cls: "jnr-text-btn", attr: { type: "button" } }).addEventListener("click", () => this.plugin.sendTestReminder());
+    testRow.createEl("button", { text: "\u518D\u5F39\u4E00\u6B21", cls: "jnr-text-btn", attr: { type: "button" } }).addEventListener("click", () => {
+      if (!this.plugin.reminderService) {
+        new import_obsidian15.Notice("\u63D0\u9192\u670D\u52A1\u672A\u542F\u52A8\uFF0C\u8BF7\u5148\u6FC0\u6D3B\u6216\u91CD\u8F7D\u63D2\u4EF6");
+        return;
+      }
+      this.plugin.reminderService.replayTodayReminders();
+    });
+    card.createEl("p", {
+      cls: "jnr-settings-section-hint",
+      text: "\u300C\u53D1\u9001\u6D4B\u8BD5\u300D\u53EA\u6D4B\u5F39\u7A97\u6E20\u9053\uFF1B\u300C\u518D\u5F39\u4E00\u6B21\u300D\u6E05\u6389\u4ECA\u5929\u5DF2\u8BFB\u5E76\u518D\u5F39\uFF08\u4F1A\u5148\u5173\u95ED\u8BBE\u7F6E\u9875\uFF0C\u907F\u514D\u5F39\u7A97\u88AB\u6321\u4F4F\uFF09\u3002"
+    });
   }
   renderOnboarding(parent) {
     const box = parent.createDiv({ cls: "jnr-onboarding" });
@@ -16207,7 +16363,12 @@ var JinianriSettingTab = class extends import_obsidian15.PluginSettingTab {
       });
       const events = this.plugin.events.filter((e) => e.group === groupId).sort((a, b) => a.sortOrder - b.sortOrder);
       if (events.length === 0) {
-        block.createDiv({ cls: "jnr-settings-group-empty", text: "\u6682\u65E0\u4E8B\u9879\uFF0C\u70B9\u51FB + \u4E8B\u9879 \u6DFB\u52A0" });
+        renderLifeOsEmptyState(block.createDiv(), {
+          icon: "\u{1F4CC}",
+          message: "\u6682\u65E0\u4E8B\u9879\uFF0C\u70B9\u51FB + \u4E8B\u9879 \u6DFB\u52A0",
+          ctaLabel: "+ \u4E8B\u9879",
+          onCta: () => this.openEventModal(null, groupId)
+        });
         continue;
       }
       const scrollWrap = block.createDiv({ cls: "jnr-settings-table-scroll" });
@@ -16219,6 +16380,13 @@ var JinianriSettingTab = class extends import_obsidian15.PluginSettingTab {
   renderGeneralPanel(panel) {
     const grid = panel.createDiv({ cls: "jnr-settings-grid" });
     const card = this.createBlock(grid, "\u901A\u7528", "\u72B6\u6001\u680F\u3001\u7B14\u8BB0\u5D4C\u5165\u4E0E\u770B\u677F\u663E\u793A\u9009\u9879\u3002");
+    new import_obsidian15.Setting(card).setName("\u72B6\u6001\u680F").addToggle(
+      (toggle) => toggle.setValue(this.plugin.settings.showStatusBar).onChange(async (value) => {
+        this.plugin.settings.showStatusBar = value;
+        await this.plugin.persistSettings();
+        this.plugin.statusBar.update();
+      })
+    );
     if (import_obsidian15.Platform.isMobile) {
       card.createEl("p", {
         cls: "jnr-settings-section-hint",
@@ -16229,17 +16397,12 @@ var JinianriSettingTab = class extends import_obsidian15.PluginSettingTab {
       cls: "jnr-settings-section-hint",
       text: "\u770B\u677F\u652F\u6301\u5217\u8868 / \u65F6\u95F4\u8F74 / \u6708\u5386\u4E09\u79CD\u89C6\u56FE\u3002\u6298\u53E0\u5206\u7EC4\u3001\u62D6\u52A8\u6392\u5E8F\u4E0E\u5E95\u90E8\u4EA4\u4E92\u63D0\u793A\u4EC5\u5728 **\u5217\u8868** \u89C6\u56FE\uFF1B\u9876\u90E8\u7B5B\u9009\u4E0B\u62C9\u9002\u7528\u4E8E\u5168\u90E8\u89C6\u56FE\u3002"
     });
-    new import_obsidian15.Setting(card).setName("\u72B6\u6001\u680F").addToggle(
-      (toggle) => toggle.setValue(this.plugin.settings.showStatusBar).onChange(async (value) => {
-        this.plugin.settings.showStatusBar = value;
-        await this.plugin.persistSettings();
-        this.plugin.statusBar.update();
-      })
-    );
     this.addSubgroupTitle(card, "\u65E5\u671F\u89C4\u5219");
-    new import_obsidian15.Setting(card).setName("2 \u6708 29 \u65E5").setDesc("\u9633\u5386 2/29 \u7684\u7EAA\u5FF5\u65E5\u5728\u975E\u95F0\u5E74\u843D\u5728\u54EA\u5929").addDropdown((dd) => {
-      dd.addOption("feb28", "\u843D\u5230 2 \u6708 28 \u65E5\uFF08\u63A8\u8350\uFF09");
-      dd.addOption("mar1", "\u843D\u5230 3 \u6708 1 \u65E5");
+    new import_obsidian15.Setting(card).setName("2 \u6708 29 \u65E5").setClass("jnr-settings-leap-row").setDesc(
+      "\u9633\u5386\u751F\u65E5/\u7EAA\u5FF5\u65E5\u82E5\u843D\u5728 2 \u6708 29 \u65E5\uFF0C\u9047\u5230\u975E\u95F0\u5E74\u6CA1\u6709\u8FD9\u4E00\u5929\u65F6\uFF1A\u9009\u300C2 \u6708 28 \u65E5\u300D\u63D0\u524D\u4E00\u5929\u8FC7\uFF08\u56FD\u5185\u5E38\u89C1\uFF09\uFF1B\u9009\u300C3 \u6708 1 \u65E5\u300D\u5219\u987A\u5EF6\u5230\u7B2C\u4E8C\u5929\u3002"
+    ).addDropdown((dd) => {
+      dd.addOption("feb28", "2 \u6708 28 \u65E5");
+      dd.addOption("mar1", "3 \u6708 1 \u65E5");
       dd.setValue(
         this.plugin.settings.leapDayFallback === "mar1" ? "mar1" : "feb28"
       );
@@ -16252,7 +16415,7 @@ var JinianriSettingTab = class extends import_obsidian15.PluginSettingTab {
     });
     card.createEl("p", {
       cls: "jnr-settings-section-hint",
-      text: "\u4E2D\u6587\u4E60\u60EF\u591A\u6309 2 \u6708 28 \u65E5\u8FC7\uFF1B\u9009 3 \u6708 1 \u65E5\u5219\u987A\u5EF6\u5230\u4E0B\u4E00\u5929\u3002"
+      text: "\u53EA\u5F71\u54CD\u9633\u5386 2/29\uFF1B\u519C\u5386\u4E0E\u5176\u5B83\u65E5\u671F\u4E0D\u53D7\u6B64\u9009\u9879\u5F71\u54CD\u3002"
     });
     this.addSubgroupTitle(card, "\u7B14\u8BB0\u5D4C\u5165");
     new import_obsidian15.Setting(card).setName("\u5D4C\u5165\u4EE3\u7801").addButton(
@@ -16272,26 +16435,34 @@ var JinianriSettingTab = class extends import_obsidian15.PluginSettingTab {
     this.addSubgroupTitle(card, "\u6570\u636E\u6587\u4EF6");
     const settingsPath = getPluginSettingsPath(this.plugin.app);
     const eventsPath = this.plugin.dataStore.getEventsPath();
-    new import_obsidian15.Setting(card).setName("data.json").setClass("jnr-settings-action-row").addButton(
-      (btn) => btn.setButtonText("\u6253\u5F00").onClick(() => void this.openSettingsFile())
+    const addDataFileRow = (label, path, onOpen) => {
+      const row = card.createDiv({ cls: "jnr-settings-data-file-row" });
+      const text = row.createDiv({ cls: "jnr-settings-data-file-text" });
+      text.createDiv({ cls: "jnr-settings-data-file-label", text: label });
+      text.createDiv({ cls: "jnr-settings-data-file-path", text: path });
+      row.createEl("button", {
+        text: "\u6253\u5F00",
+        cls: "jnr-text-btn",
+        attr: { type: "button" }
+      }).addEventListener("click", () => void onOpen());
+    };
+    addDataFileRow(
+      "\u63D0\u9192\u6863\u4F4D\u3001\u5206\u7EC4\u540D\u79F0\u7B49\u63D2\u4EF6\u8BBE\u7F6E\u3002",
+      settingsPath,
+      () => this.openSettingsFile()
     );
-    card.createEl("p", {
-      cls: "jnr-settings-section-hint",
-      text: `\u63D0\u9192\u6863\u4F4D\u3001\u5206\u7EC4\u540D\u79F0\u7B49\u63D2\u4EF6\u8BBE\u7F6E\u3002
-${settingsPath}`
-    });
-    new import_obsidian15.Setting(card).setName("events.json").setClass("jnr-settings-action-row").addButton(
-      (btn) => btn.setButtonText("\u6253\u5F00").onClick(() => void this.plugin.dataStore.openEventsFile())
+    addDataFileRow(
+      "\u5168\u90E8\u7EAA\u5FF5\u4E8B\u9879\u6570\u636E\uFF0C\u968F\u5E93 / iCloud \u540C\u6B65\u3002",
+      eventsPath,
+      () => this.plugin.dataStore.openEventsFile()
     );
-    card.createEl("p", {
-      cls: "jnr-settings-section-hint",
-      text: `\u5168\u90E8\u7EAA\u5FF5\u4E8B\u9879\u6570\u636E\uFF0C\u968F\u5E93 / iCloud \u540C\u6B65\u3002
-${eventsPath}`
-    });
   }
   async confirmImportFromMarkdown() {
     const events = await this.plugin.dataStore.importFromMarkdown(false);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+      new import_obsidian15.Notice("\u672A\u5728 \u7EAA\u5FF5\u65E5.md \u4E2D\u627E\u5230\u53EF\u5BFC\u5165\u5185\u5BB9");
+      return;
+    }
     const current = this.plugin.events.length;
     const message = current === 0 ? `\u5C06\u4ECE \u7EAA\u5FF5\u65E5.md \u5BFC\u5165 ${events.length} \u6761\u7EAA\u5FF5\u4E8B\u9879\uFF0C\u662F\u5426\u7EE7\u7EED\uFF1F` : `\u4ECE \u7EAA\u5FF5\u65E5.md \u5BFC\u5165\u5C06\u66FF\u6362\u5F53\u524D ${current} \u6761\uFF0C\u5171 ${events.length} \u6761\u3002
 
@@ -16309,12 +16480,8 @@ ${eventsPath}`
   async openSettingsFile() {
     const path = getPluginSettingsPath(this.plugin.app);
     await this.plugin.rewriteSettingsOnly();
-    const file = this.plugin.app.vault.getAbstractFileByPath(path);
-    if (file) {
-      await this.plugin.app.workspace.getLeaf().openFile(file);
-      return;
-    }
-    new import_obsidian15.Notice(`\u8BBE\u7F6E\u6587\u4EF6\uFF1A${path}`);
+    const opened = await openPluginConfigFile(this.plugin.app, path);
+    if (!opened) new import_obsidian15.Notice(`\u8BBE\u7F6E\u6587\u4EF6\uFF1A${path}`);
   }
   renderTableHeader(list) {
     const colHeader = list.createDiv({ cls: "jnr-settings-colhead" });
@@ -16799,14 +16966,36 @@ var ReminderService = class {
   }
   /** 清掉今天的已读并立刻再弹（设置页挡住弹窗时用） */
   replayTodayReminders() {
+    var _a, _b;
+    if (!this.plugin.isLicensed()) {
+      new import_obsidian19.Notice("\u8BF7\u5148\u6FC0\u6D3B\u540E\u518D\u8BD5");
+      return;
+    }
     const today = formatYmd(/* @__PURE__ */ new Date());
     const suffix = `:today:${today}`;
+    const before = this.plugin.settings.sentReminderKeys.length;
     this.plugin.settings.sentReminderKeys = this.plugin.settings.sentReminderKeys.filter(
       (key) => !key.endsWith(suffix)
     );
     this.alreadySentHintDay = "";
-    void this.plugin.saveSettings();
-    this.checkReminders(true);
+    this.noChannelNoticeDay = "";
+    try {
+      (_b = (_a = this.plugin.app.setting) == null ? void 0 : _a.close) == null ? void 0 : _b.call(_a);
+    } catch (e) {
+    }
+    void this.plugin.saveSettings().then(() => {
+      window.setTimeout(() => {
+        const pendingBefore = this.collectPending();
+        if (pendingBefore.length === 0) {
+          new import_obsidian19.Notice(
+            before === this.plugin.settings.sentReminderKeys.length ? "\u4ECA\u5929\u6CA1\u6709\u9700\u8981\u518D\u5F39\u7684\u7EAA\u5FF5\u65E5\u63D0\u9192\uFF08\u6CA1\u6709\u300C\u5C31\u662F\u4ECA\u5929\u300D\u7684\u4E8B\u9879\uFF0C\u6216\u63D0\u9192\u5DF2\u5173\uFF09" : "\u5DF2\u6E05\u9664\u4ECA\u65E5\u300C\u5DF2\u63D0\u9192\u300D\u6807\u8BB0\uFF0C\u4F46\u5F53\u524D\u6CA1\u6709\u5F85\u63D0\u9192\u4E8B\u9879",
+            5e3
+          );
+          return;
+        }
+        this.checkReminders(true);
+      }, 120);
+    });
   }
   /** 后台挂起跨日后回到前台，再检查一轮未发过的提醒 */
   onDayMayHaveChanged() {
@@ -16998,11 +17187,14 @@ var DataStore = class {
       file = this.plugin.app.vault.getAbstractFileByPath(path);
     }
     if (file instanceof import_obsidian20.TFile) {
-      await this.plugin.app.workspace.getLeaf().openFile(file);
+      await this.plugin.app.workspace.getLeaf(false).openFile(file);
       return;
     }
-    new import_obsidian20.Notice(`\u6570\u636E\u6587\u4EF6\uFF1A${path}
+    const opened = await openPluginConfigFile(this.plugin.app, path);
+    if (!opened) {
+      new import_obsidian20.Notice(`\u6570\u636E\u6587\u4EF6\uFF1A${path}
 \uFF08\u4F4D\u4E8E\u63D2\u4EF6\u76EE\u5F55\uFF0C\u53EF\u7528\u6587\u4EF6\u7BA1\u7406\u5668\u6253\u5F00\uFF09`);
+    }
   }
   /** @deprecated 使用 openEventsFile */
   async openDataFile() {

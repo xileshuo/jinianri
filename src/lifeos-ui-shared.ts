@@ -56,8 +56,10 @@ export function showLifeOsFirstRunCard(
     title?: string;
     bullets?: string[];
     primaryLabel?: string;
+    secondaryLabel?: string;
     laterLabel?: string;
     onPrimary?: () => void;
+    onSecondary?: () => void;
   }
 ): HTMLElement | null {
   injectLifeOsSharedStyles();
@@ -82,6 +84,17 @@ export function showLifeOsFirstRunCard(
     primary.onclick = () => {
       dismiss();
       options.onPrimary?.();
+    };
+  }
+  if (options.secondaryLabel) {
+    const secondary = actions.createEl("button", {
+      cls: "lifeos-first-run-secondary",
+      text: options.secondaryLabel,
+      type: "button",
+    });
+    secondary.onclick = () => {
+      dismiss();
+      options.onSecondary?.();
     };
   }
   actions.createEl("button", { text: options.laterLabel || "知道了", type: "button" }).onclick = dismiss;
@@ -131,30 +144,8 @@ export function appendLifeOsSettingsFamilyFoot(container: HTMLElement): void {
   /* 已迁移至「关于」Tab，见 renderLifeOsFamilyFoot */
 }
 
-export function renderLifeOsFamilyFoot(container: HTMLElement, app: App, selfId: string): void {
-  injectLifeOsSharedStyles();
-  const foot = container.createDiv({ cls: "lifeos-family-foot" });
-  foot.createSpan({ text: "LifeOS 插件族 · " });
-  const catalog = [
-    { id: "plain-ledger", name: "PlainLedger" },
-    { id: "jinianri", name: "纪念日" },
-    { id: "braincore-lifeos", name: "BrainCore LifeOS" },
-  ];
-  const peers = catalog.filter((p) => p.id !== selfId);
-  peers.forEach((item, idx) => {
-    if (idx > 0) foot.createSpan({ text: " · " });
-    const link = foot.createEl("a", { text: item.name, href: "#", cls: "lifeos-family-foot-link" });
-    link.onclick = (e) => {
-      e.preventDefault();
-      const plugin = app.plugins?.plugins?.[item.id]
-        || (item.id === "braincore-lifeos" ? app.plugins?.plugins?.["braincore-dashboard"] : null);
-      if (!plugin) {
-        new Notice(`未检测到 ${item.name}，请先在设置中启用对应插件`);
-        return;
-      }
-      openLifeOsPluginSettings(app, item.id);
-    };
-  });
+export function renderLifeOsFamilyFoot(_container: HTMLElement, _app: App, _selfId: string): void {
+  /* 已迁移至「关于 → 所有作品」，保留空实现避免旧调用报错 */
 }
 
 export function getLifeOsVaultKey(app: App, suffix: string): string {

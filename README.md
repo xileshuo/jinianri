@@ -1,7 +1,7 @@
 # jinianri
 > **付费 · 48 小时试用 · ¥29.9 永久激活**
 Obsidian 生日与纪念日插件（LifeOS）。阴历/阳历、侧边栏倒计时、三档提醒、iCal 导出。插件市场显示名：jinianri。
-当前公开版本：**4.0.16 · 48 小时试用**
+当前公开版本：**4.0.17 · 48 小时试用**
 ## 定价与购买
 | 项目 | 说明 |
 | --- | --- |
@@ -199,6 +199,15 @@ https://github.com/xileshuo/jinianri
 
 打开 Obsidian → 点击日历爱心图标 → 激活后管理你的重要日期 → 到点自动提醒，不再错过。
 ## 更新日志
+### 4.0.17
+
+- 体验：首启 / 套装提示可点「去了解」；提醒重放与导入提示更稳
+- 设置：数据文件行布局对齐 LifeOS；手机设置顶距与侧栏一致
+
+### 4.0.16
+
+- 版本对齐：公版 / 体验包与 LifeOS 同步发布
+
 ### 4.0.15
 
 - 审核：manifest.description 改以英文句号结尾（Scorecard 不认中文 。）
@@ -226,16 +235,6 @@ https://github.com/xileshuo/jinianri
 
 - 社区 Scorecard：`npm run build` 默认 trial 旗标，与 Release 48h 体验版 main.js 对齐
 - 文档：README 保持英文短说明；中文说明移至 README.zh.md
-
-### 4.0.9
-
-- 社区审核：README 英文 Installation / Usage / Pricing 前置；去掉 builtin-modules 依赖
-- 社区审核：window.requestAnimationFrame、createEl 与 Node.instanceOf 小清理
-
-### 4.0.8
-
-- 社区审核：设置页与关于/授权区块统一 Setting.setHeading()，消除 scorecard heading Error
-- 社区审核：提醒弹窗标题改为非 heading 元素；补齐 lifeos 区块 setHeading 样式
 ---
 ## 分发说明
 本仓库用于社区插件 / BRAT / GitHub Release 分发与产品介绍，并附带 `src/` 等源码便于社区审核。
@@ -251,7 +250,7 @@ https://github.com/xileshuo/jinianri
 
 jinianri is a paid LifeOS plugin for birthdays and memorial dates in Obsidian, with lunar/solar calendars, sidebar countdowns, multi-level reminders, and iCal export.
 
-Current public build: **4.0.16** (48-hour trial).
+Current public build: **4.0.17** (48-hour trial).
 
 ## LifeOS family
 

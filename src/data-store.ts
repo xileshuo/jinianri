@@ -6,6 +6,7 @@ import { normalizeEvent } from "./types";
 import {
   getLegacyCombinedDataPath,
   getPluginEventsPath,
+  openPluginConfigFile,
   LEGACY_VAULT_DATA_FILES,
 } from "./plugin-paths";
 import {
@@ -234,10 +235,13 @@ export class DataStore {
       file = this.plugin.app.vault.getAbstractFileByPath(path);
     }
     if (file instanceof TFile) {
-      await this.plugin.app.workspace.getLeaf().openFile(file);
+      await this.plugin.app.workspace.getLeaf(false).openFile(file);
       return;
     }
-    new Notice(`数据文件：${path}\n（位于插件目录，可用文件管理器打开）`);
+    const opened = await openPluginConfigFile(this.plugin.app, path);
+    if (!opened) {
+      new Notice(`数据文件：${path}\n（位于插件目录，可用文件管理器打开）`);
+    }
   }
 
   /** @deprecated 使用 openEventsFile */

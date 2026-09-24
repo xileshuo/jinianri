@@ -1,4 +1,4 @@
-import { Notice, Setting } from "obsidian";
+import { Notice, Setting, Modal } from "obsidian";
 import type JinianriPlugin from "./main";
 import { renderLifeOsActivationPreview, openLifeOsPluginSettings } from "./lifeos-ui-shared";
 
@@ -64,9 +64,31 @@ export function maybeShowLifeOsSuitePrompt(app: JinianriPlugin["app"], selfId: s
   try {
     if (localStorage.getItem(storageKey) === "1") return;
   } catch { /* ignore */ }
+  const peerText = peers.join("、");
   window.setTimeout(() => {
-    new Notice(`${selfName} 可与 ${peers.join("、")} 并排使用，数据均保存在同一 Obsidian 库内。`, 8000);
-    try { localStorage.setItem(storageKey, "1"); } catch { /* ignore */ }
+    try {
+      if (localStorage.getItem(storageKey) === "1") return;
+    } catch { /* ignore */ }
+    const markSeen = () => {
+      try { localStorage.setItem(storageKey, "1"); } catch { /* ignore */ }
+    };
+    try {
+      const modal = new Modal(app);
+      modal.setTitle("LifeOS 套装");
+      modal.contentEl.createEl("p", {
+        text: `${selfName} 可与 ${peerText} 并排使用，数据均保存在同一 Obsidian 库内。`,
+      });
+      const row = modal.contentEl.createDiv({ cls: "modal-button-container" });
+      const btn = row.createEl("button", { text: "知道了", cls: "mod-cta", type: "button" });
+      btn.onclick = () => {
+        markSeen();
+        modal.close();
+      };
+      modal.open();
+    } catch (_) {
+      new Notice(`${selfName} 可与 ${peerText} 并排使用，数据均保存在同一 Obsidian 库内。`, 8000);
+      markSeen();
+    }
   }, 2200);
 }
 
@@ -76,6 +98,7 @@ function openLifeOsExternalUrl(url: string): void {
     window.open(url, "_blank");
   } catch (err) {
     console.warn("[LifeOS] open external url", err);
+    try { new Notice("无法打开链接"); } catch { /* ignore */ }
   }
 }
 
@@ -111,7 +134,7 @@ export function renderLifeOsActivationPanel(container: HTMLElement, config: Life
 
   const wrap = container.createDiv({ cls: "lifeos-act-wrap" });
   const card = wrap.createDiv({ cls: "lifeos-act-card" });
-  card.createDiv({ cls: "lifeos-act-title", text: config.pluginName });
+  card.createEl("h2", { cls: "lifeos-act-title", text: config.pluginName });
 
   const statusText = config.getStatusText?.() || "";
   if (statusText) card.createEl("p", { cls: "lifeos-act-status", text: statusText });
@@ -150,7 +173,7 @@ export function renderLifeOsActivationPanel(container: HTMLElement, config: Life
   if (config.licenseKey) keyInput.value = config.licenseKey;
   const activateBtn = keyRow.createEl("button", {
     cls: "lifeos-act-btn lifeos-act-btn-primary",
-    text: config.activateShortLabel || "验证并激活",
+    text: config.activateShortLabel || "激活",
     type: "button",
   });
 
@@ -226,7 +249,7 @@ export function renderLifeOsLicenseSettingsPanel(panel: HTMLElement, config: Lif
   keyInput.addEventListener("input", () => { keyValue = keyInput.value.trim(); });
   keyRow.createEl("button", {
     cls: "lifeos-act-btn lifeos-act-btn-primary",
-    text: "验证并激活",
+    text: "激活",
     type: "button",
   }).onclick = () => void config.onActivate?.(keyValue.trim());
   keyInput.addEventListener("keydown", (e) => {
