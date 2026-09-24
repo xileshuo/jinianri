@@ -49,24 +49,20 @@ export class JinianriSettingTab extends PluginSettingTab {
       containerEl.addClass("jnr-settings-mobile");
     }
 
-    // 桌面：顶栏标题（与 CSS .jnr-settings-page-title 对齐；勿用 Setting.setHeading，部分主题会压成空白）
+    // 桌面：顶栏标题（Setting.setHeading，避免 Scorecard no-static-styles / 手写 h2）
     if (!isMobile) {
-      containerEl.createEl("h2", {
-        cls: "jnr-settings-page-title",
-        text: formatPluginSettingsTitle("纪念日 配置", getEditionLabel(this.plugin.settings)),
-      });
+      new Setting(containerEl)
+        .setName(formatPluginSettingsTitle("纪念日 配置", getEditionLabel(this.plugin.settings)))
+        .setHeading()
+        .setClass("jnr-settings-page-title");
     }
 
     const locked = isLicenseEnforced() && !this.plugin.isLicensed();
     const introText =
       typeof PLUGIN_PHILOSOPHY_SUBTITLE === "string" ? PLUGIN_PHILOSOPHY_SUBTITLE.trim() : "";
     if (introText) {
-      const introEl = containerEl.createEl("p", { cls: "jnr-settings-intro", text: introText });
-      introEl.style.setProperty("margin", "0 0 6px", "important");
-      introEl.style.setProperty("padding", "0", "important");
-      introEl.style.setProperty("text-indent", "4em", "important");
-      introEl.style.setProperty("line-height", "1.35", "important");
-      introEl.style.setProperty("font-size", "12px", "important");
+      // 版式交给 styles.css .jnr-settings-intro，勿 inline !important（Scorecard Risk）
+      containerEl.createEl("p", { cls: "jnr-settings-intro", text: introText });
     }
     if (locked) {
       containerEl.createEl("p", {

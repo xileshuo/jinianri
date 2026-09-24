@@ -4,7 +4,7 @@ const { Plugin, ItemView, WorkspaceLeaf, Modal, Notice, Menu, PluginSettingTab, 
 // 【可编辑区】版本 / 更新说明 / 授权 — 与 BrainCore 一样，改这里即可
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const PLUGIN_VERSION = "4.0.17";
+const PLUGIN_VERSION = "4.0.18";
 // 发行版本标记，取值 personal | public。与 PLUGIN_REQUIRE_LICENSE 是两个独立维度：
 // 这个决定「给谁用、预填什么数据」（个人版 = 个人纪念事项，公版 = 3 条示例），
 // PLUGIN_REQUIRE_LICENSE 决定「要不要激活码」。公版（免激活）就是 public + false。
@@ -13845,7 +13845,8 @@ function renderLifeOsEmptyState(parent, options) {
 function showLifeOsFirstRunCard(container, app, storageKey, options) {
   injectLifeOsSharedStyles();
   try {
-    if (localStorage.getItem(storageKey) === "1") return null;
+    const seen = typeof (app == null ? void 0 : app.loadLocalStorage) === "function" ? app.loadLocalStorage(storageKey) : localStorage.getItem(storageKey);
+    if (seen === "1") return null;
   } catch (e) {
   }
   const card = container.createDiv({ cls: "lifeos-first-run-card" });
@@ -13855,7 +13856,8 @@ function showLifeOsFirstRunCard(container, app, storageKey, options) {
   const actions = card.createDiv({ cls: "lifeos-first-run-actions" });
   const dismiss = () => {
     try {
-      localStorage.setItem(storageKey, "1");
+      if (typeof (app == null ? void 0 : app.saveLocalStorage) === "function") app.saveLocalStorage(storageKey, "1");
+      else localStorage.setItem(storageKey, "1");
     } catch (e) {
     }
     card.remove();
@@ -16024,20 +16026,12 @@ var JinianriSettingTab = class extends import_obsidian15.PluginSettingTab {
       containerEl.addClass("jnr-settings-mobile");
     }
     if (!isMobile) {
-      containerEl.createEl("h2", {
-        cls: "jnr-settings-page-title",
-        text: formatPluginSettingsTitle("\u7EAA\u5FF5\u65E5 \u914D\u7F6E", getEditionLabel(this.plugin.settings))
-      });
+      new import_obsidian15.Setting(containerEl).setName(formatPluginSettingsTitle("\u7EAA\u5FF5\u65E5 \u914D\u7F6E", getEditionLabel(this.plugin.settings))).setHeading().setClass("jnr-settings-page-title");
     }
     const locked = isLicenseEnforced() && !this.plugin.isLicensed();
     const introText = typeof PLUGIN_PHILOSOPHY_SUBTITLE === "string" ? PLUGIN_PHILOSOPHY_SUBTITLE.trim() : "";
     if (introText) {
-      const introEl = containerEl.createEl("p", { cls: "jnr-settings-intro", text: introText });
-      introEl.style.setProperty("margin", "0 0 6px", "important");
-      introEl.style.setProperty("padding", "0", "important");
-      introEl.style.setProperty("text-indent", "4em", "important");
-      introEl.style.setProperty("line-height", "1.35", "important");
-      introEl.style.setProperty("font-size", "12px", "important");
+      containerEl.createEl("p", { cls: "jnr-settings-intro", text: introText });
     }
     if (locked) {
       containerEl.createEl("p", {
