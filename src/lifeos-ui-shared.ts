@@ -64,10 +64,8 @@ export function showLifeOsFirstRunCard(
 ): HTMLElement | null {
   injectLifeOsSharedStyles();
   try {
-    const seen = typeof app?.loadLocalStorage === "function"
-      ? app.loadLocalStorage(storageKey)
-      : localStorage.getItem(storageKey);
-    if (seen === "1") return null;
+    // 首启标记用浏览器 localStorage（勿用高于 minApp 的 App 存储 API）
+    if (localStorage.getItem(storageKey) === "1") return null;
   } catch { /* ignore */ }
   const card = container.createDiv({ cls: "lifeos-first-run-card" });
   card.createEl("p", { cls: "lifeos-first-run-title", text: options.title || "欢迎使用 LifeOS" });
@@ -76,8 +74,7 @@ export function showLifeOsFirstRunCard(
   const actions = card.createDiv({ cls: "lifeos-first-run-actions" });
   const dismiss = () => {
     try {
-      if (typeof app?.saveLocalStorage === "function") app.saveLocalStorage(storageKey, "1");
-      else localStorage.setItem(storageKey, "1");
+      localStorage.setItem(storageKey, "1");
     } catch { /* ignore */ }
     card.remove();
   };
